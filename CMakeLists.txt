@@ -1,24 +1,19 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14) 
+project(Payload)
 
-# Project Name
-project(ADDPP_Payload)
-
-# Use C++ 17 (Standard for modern file system access)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# --- CRITICAL: Static Linking Configuration ---
-if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    add_compile_options(/W4)
-endif()
+# --- CRITICAL FIX: FORCING STATIC LINKING (/MT) ---
 
-# Include directories
-include_directories(${PROJECT_SOURCE_DIR}/include)
+# 1. Apply the standard static runtime library setting.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
-# Create the executable from main.cpp in src/
+# 2. AGGRESSIVELY OVERRIDE: Add the /MT flag directly to all compile options.
+# This ensures the compiler links the runtime statically, eliminating MSVCP140D.dll, etc.
+add_compile_options("/MT") 
+
+# --- END CRITICAL FIX ---
+
+# BUILD EXECUTABLE
 add_executable(Payload src/main.cpp)
-
-# Copy data files to build directory
-file(COPY ${CMAKE_SOURCE_DIR}/data/Text.txt 
-     DESTINATION ${CMAKE_BINARY_DIR})

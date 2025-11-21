@@ -29,9 +29,10 @@ void extract_and_print_features(const fs::directory_entry &entry)
 {
   std::error_code ec;
 
-  std::wstring path = entry.path().wstring();
-  std::wstring name = entry.path().filename().wstring();
-  std::wstring ext = entry.path().extension().wstring();
+  const auto &p = entry.path();
+  std::wstring path = p.wstring();
+  std::wstring name = p.filename().wstring();
+  std::wstring ext = p.extension().wstring();
 
   std::wcout << L"[SCAN] " << path << L"\n";
   std::wcout << L"  - Name: " << name << L"\n";
