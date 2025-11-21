@@ -39,3 +39,9 @@
 
 # debug information files
 *.dwo
+/.vs
+/CyberSec.892b1bdc
+CyberSecurityMLproject.slnx
+CyberSecurityMLproject.vcxproj
+CyberSecurityMLproject.vcxproj.filters
+CyberSecurityMLproject.vcxproj.user
