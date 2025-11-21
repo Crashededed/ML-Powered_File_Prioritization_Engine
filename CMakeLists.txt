@@ -8,12 +8,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # --- CRITICAL: Static Linking Configuration ---
-# This replaces the "Runtime Library -> /MT" setting you did in the VS IDE.
-# It ensures your .exe runs on the VM without missing DLL errors.
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    add_compile_options(/W4) # Enable warnings to help catch bugs
+    add_compile_options(/W4)
 endif()
 
-# Create the executable from main.cpp
-add_executable(Payload main.cpp)
+# Include directories
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+# Create the executable from main.cpp in src/
+add_executable(Payload src/main.cpp)
+
+# Copy data files to build directory
+file(COPY ${CMAKE_SOURCE_DIR}/data/Text.txt 
+     DESTINATION ${CMAKE_BINARY_DIR})
