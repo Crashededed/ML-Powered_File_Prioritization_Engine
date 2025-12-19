@@ -8,6 +8,16 @@
 
 namespace fs = std::filesystem;
 
+struct file_features
+{
+  std::wstring path;
+  std::wstring name;
+  std::wstring extension;
+  uintmax_t file_size;
+  uintmax_t last_write_time;
+  bool is_read_only;
+};
+
 // --- DEDICATED METRICS FUNCTION ---
 void report_scan_metrics(size_t total_files,
                          std::chrono::high_resolution_clock::time_point start_time,
@@ -25,37 +35,47 @@ void report_scan_metrics(size_t total_files,
   std::wcout << L"=================================\n";
 }
 
-void extract_and_print_features(const fs::directory_entry &entry)
+file_features extract_file_features(const fs::directory_entry &entry)
 {
+  file_features features;
   std::error_code ec;
 
   const auto &p = entry.path();
-  std::wstring path = p.wstring();
-  std::wstring name = p.filename().wstring();
-  std::wstring ext = p.extension().wstring();
-
-  std::wcout << L"[SCAN] " << path << L"\n";
-  std::wcout << L"  - Name: " << name << L"\n";
-  std::wcout << L"  - Type: " << ext << L"\n";
-
-  uintmax_t file_size = entry.file_size(ec);
-  if (!ec)
-  {
-    std::wcout << L"  - Size: " << file_size << L" bytes\n";
-  }
+  features.path = p.wstring();
+  features.name = p.filename().wstring();
+  features.extension = p.extension().wstring();
+  features.file_size = entry.file_size(ec);
+  if (ec)
+    features.file_size = 0;
 
   auto last_write = entry.last_write_time(ec);
   if (!ec)
-    std::wcout << L"  - Mod Time: " << last_write.time_since_epoch().count() << L"\n";
+    features.last_write_time = last_write.time_since_epoch().count();
+  else
+    features.last_write_time = 0;
 
   auto status = entry.status(ec);
   if (!ec)
   {
     auto perms = status.permissions();
-    bool read_only = (perms & fs::perms::owner_write) == fs::perms::none;
-    std::wcout << L"  - Read Only: " << (read_only ? L"Yes" : L"No") << L"\n";
+    features.is_read_only = (perms & fs::perms::owner_write) == fs::perms::none;
+  }
+  else
+  {
+    features.is_read_only = false;
   }
 
+  return features;
+}
+
+void print_file_features(const file_features &features)
+{
+  std::wcout << L"[SCAN] " << features.path << L"\n";
+  std::wcout << L"  - Name: " << features.name << L"\n";
+  std::wcout << L"  - Type: " << features.extension << L"\n";
+  std::wcout << L"  - Size: " << features.file_size << L" bytes\n";
+  std::wcout << L"  - Mod Time: " << features.last_write_time << L"\n";
+  std::wcout << L"  - Read Only: " << (features.is_read_only ? L"Yes" : L"No") << L"\n";
   std::wcout << L"-----------------------------------\n";
 }
 
@@ -90,7 +110,8 @@ void scan_directory(std::wstring target_path)
       {
         if (entry.is_regular_file(ec))
         {
-          extract_and_print_features(entry);
+          file_features features = extract_file_features(entry);
+          print_file_features(features);
           total_files++;
         }
       }
@@ -114,7 +135,7 @@ void scan_directory(std::wstring target_path)
 int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
-  const wchar_t *path = L"D:\\XboxGames";
+  const wchar_t *path = L"C:\\Users\\013ri\\OneDrive\\Documents\\schoolwork\\CyberProject\\CyberSecurityMLproject\\data";
 
   scan_directory(path);
 
