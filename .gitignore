@@ -47,3 +47,4 @@ CyberSecurityMLproject.vcxproj.filters
 CyberSecurityMLproject.vcxproj.user
 /build
 /.vscode
+/data
