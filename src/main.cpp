@@ -29,10 +29,10 @@ void report_scan_metrics(size_t total_files, TimePoint start_time, TimePoint end
 
 int main()
 {
-  // _setmode(_fileno(stdout), _O_U16TEXT);
+  _setmode(_fileno(stdout), _O_U16TEXT);
   // const wchar_t *target_path = L"data";
 
-  // // scan directory 
+  // // scan directory
   // std::wcout << L"Scanning directory: " << target_path << std::endl;
   // std::vector<file_features> files = scan_directory(target_path);
   // std::wcout << L"Found " << files.size() << L" files. Scoring now...\n" << std::endl;
@@ -45,7 +45,7 @@ int main()
   //   // Filter output to keep it readable
   //   if (score > 0.5)
   //     std::wcout << L"[HIGH VALUE] " << file.name << L" (Score: " << score << L")" << std::endl;
-    
+
   // }
 
   // Check the score of a specific file
