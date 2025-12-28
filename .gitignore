@@ -48,3 +48,4 @@ CyberSecurityMLproject.vcxproj.user
 /build
 /.vscode
 /data
+*.xml
