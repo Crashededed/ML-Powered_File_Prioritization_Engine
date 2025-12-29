@@ -49,3 +49,4 @@ CyberSecurityMLproject.vcxproj.user
 /.vscode
 /data
 *.xml
+*.parquet
