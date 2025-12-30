@@ -70,7 +70,7 @@ double calculate_file_score(const file_features &features)
 
     double prob = 1.0 / (1.0 + std::exp(-z));
 
-    std::wcout << L"\n--- DEBUG SCORE for: " << features.name << L" ---\n";
+  /*   std::wcout << L"\n--- DEBUG SCORE for: " << features.name << L" ---\n";
     std::wcout << L"  Bias: " << MODEL_BIAS << std::endl;
     std::wcout << L"  Recency (val=" << recency_score << L"): " << z_recency << std::endl;
     std::wcout << L"  Size (val=" << size_logged << L"):    " << z_size << std::endl;
@@ -79,7 +79,7 @@ double calculate_file_score(const file_features &features)
     std::wcout << L"  Path Hash Contrib: " << z_path << std::endl;
     std::wcout << L"  FINAL LOGIT (Z):   " << z << std::endl;
     std::wcout << L"  FINAL PROBABILITY: " << prob << std::endl;
-    std::wcout << L"---------------------------------------\n";
+    std::wcout << L"---------------------------------------\n"; */
 
     return prob;
 }

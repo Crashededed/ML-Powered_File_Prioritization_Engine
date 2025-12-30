@@ -30,36 +30,35 @@ void report_scan_metrics(size_t total_files, TimePoint start_time, TimePoint end
 int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
-  // const wchar_t *target_path = L"data";
+  const wchar_t *target_path = L"D:\\downloads";
 
-  // // scan directory
-  // std::wcout << L"Scanning directory: " << target_path << std::endl;
-  // std::vector<file_features> files = scan_directory(target_path);
-  // std::wcout << L"Found " << files.size() << L" files. Scoring now...\n" << std::endl;
+  // scan directory
+  std::wcout << L"Scanning directory: " << target_path << std::endl;
+  std::vector<file_features> files = scan_directory(target_path);
+  std::wcout << L"Found " << files.size() << L" files. Scoring now...\n" << std::endl;
 
-  // // Iterate through files and score them
-  // for (const auto &file : files)
-  // {
-  //   double score = calculate_file_score(file);
+  // Iterate through files and score them
+  for (const auto &file : files)
+  {
+    double score = calculate_file_score(file);
 
-  //   // Filter output to keep it readable
-  //   if (score > 0.5)
-  //     std::wcout << L"[HIGH VALUE] " << file.name << L" (Score: " << score << L")" << std::endl;
+    // Filter output to keep it readable
+    if (score > 0.85)
+      std::wcout << L"[HIGH VALUE] " << file.path << L"\\" << file.name  << L" (Score: " << score << L")" << std::endl;
+  }
 
-  // }
+  // // Check the score of a specific file
+  // file_features test_file = {
+  //     L"C:\\Users\\benjamin50\\Downloads", // path
+  //     L"establish.key",                    // name
+  //     L".key",                             // extension
+  //     841,                                 // file_size
+  //     1750679372,                          // last_write_time
+  //     false                                // is_read_only
+  // };
 
-  // Check the score of a specific file
-  file_features test_file = {
-      L"C:\\Users\\benjamin50\\Downloads", // path
-      L"establish.key",                    // name
-      L".key",                             // extension
-      841,                                 // file_size
-      1750679372,                          // last_write_time
-      false                                // is_read_only
-  };
+  // double test_score = calculate_file_score(test_file);
+  // std::wcout << L"\nTest File Score: " << test_score << std::endl;
 
-  double test_score = calculate_file_score(test_file);
-  std::wcout << L"\nTest File Score: " << test_score << std::endl;
-
-  return 0;
+  // return 0;
 }
