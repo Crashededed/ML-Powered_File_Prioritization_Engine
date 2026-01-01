@@ -2,11 +2,11 @@
 #include <io.h>
 #include <fcntl.h>
 #include <vector>
+#include <queue>
 
 #include "../include/FileScanner.h"
 #include "../include/ModelScorer.h"
-#include <queue>
-#include "main.h"
+
 namespace fs = std::filesystem;
 namespace Chrono = std::chrono;
 
@@ -29,25 +29,18 @@ void report_scan_metrics(size_t total_files, TimePoint start_time, TimePoint end
   std::wcout << L"=================================\n";
 }
 
-void test_specific_file()
+void test_specific_file(wchar_t *TARGET_PATH)
 {
-  // Check the score of a specific file
-  file_features test_file = {
-      L"C:\\Users\\benjamin50\\Downloads", // path
-      L"establish.key",                    // name
-      L".key",                             // extension
-      841,                                 // file_size
-      1750679372,                          // last_write_time
-      false                                // is_read_only
-  };
+  file_features f = extract_file_features(fs::directory_entry(TARGET_PATH));
+  print_file_features(f);
 
-  double test_score = calculate_file_score(test_file);
+  double test_score = calculate_file_score(f);
   std::wcout << L"\nTest File Score: " << test_score << std::endl;
 }
 
 const wchar_t *TARGET_PATH = L"D:\\downloads";
-const int N_SAMPLES = 50;
-
+const int N_SAMPLES = 15;
+/* 
 int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
@@ -119,5 +112,11 @@ int main()
     std::wcout << L"Score: " << sf.score << L" | " << sf.file.path << L"\\" << sf.file.name << std::endl;
   }
 
+  return 0;
+}
+ */
+int main()
+{
+  test_specific_file((wchar_t *)L"D:\\downloads\\SPL251-Assignment3-student-template\\SPL251-Assignment3-student-template\\server\\target\\classes\\bgu\\spl\\net\\api\\StompMessagingProtocol.class");
   return 0;
 }

@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 
-//todo: match half life to python
+// todo: match half life to python
 static double compute_recency_score(unsigned long last_write_time)
 {
     double secs_in_day = 60.0 * 60.0 * 24.0;
@@ -54,32 +54,37 @@ double calculate_file_score(const file_features &features)
     double recency_score = compute_recency_score(features.last_write_time);
     double size_logged = std::log1p(features.file_size);
     double valuable_ext = is_valuable_ext(features.extension) ? 1.0 : 0.0;
+    double name_len = static_cast<double>(features.name.length());
+    double path_len = static_cast<double>(features.path.length());
 
     double z_recency = (MODEL_WEIGHTS[0] * recency_score);
     double z_size = (MODEL_WEIGHTS[1] * size_logged);
     double z_ext = (MODEL_WEIGHTS[2] * valuable_ext);
+    double z_name_len = (MODEL_WEIGHTS[3] * name_len);
+    double z_path_len = (MODEL_WEIGHTS[4] * path_len);
 
-    z += z_recency + z_size + z_ext;
+    z += z_recency + z_size + z_ext + z_name_len + z_path_len;
 
     // Add Hashing Features (Weights 3-1026 for name, 1027-2050 for path)
-    double z_name = accumulate_hashing_weights(features.name, 3);
-    double z_path = accumulate_hashing_weights(features.path, 1027);
-
+    double z_name = accumulate_hashing_weights(features.name, 5);
+    double z_path = accumulate_hashing_weights(features.path, 1029);
     z += z_name;
     z += z_path;
 
     double prob = 1.0 / (1.0 + std::exp(-z));
 
-  /*   std::wcout << L"\n--- DEBUG SCORE for: " << features.name << L" ---\n";
+    std::wcout << L"\n--- DEBUG SCORE for: " << features.name << L" ---\n";
     std::wcout << L"  Bias: " << MODEL_BIAS << std::endl;
     std::wcout << L"  Recency (val=" << recency_score << L"): " << z_recency << std::endl;
     std::wcout << L"  Size (val=" << size_logged << L"):    " << z_size << std::endl;
+    std::wcout << L"  Name Length (val=" << name_len << L"): " << z_name_len << std::endl;
+    std::wcout << L"  Path Length (val=" << path_len << L"): " << z_path_len << std::endl;
     std::wcout << L"  Ext (val=" << valuable_ext << L"):     " << z_ext << std::endl;
     std::wcout << L"  Name Hash Contrib: " << z_name << std::endl;
     std::wcout << L"  Path Hash Contrib: " << z_path << std::endl;
     std::wcout << L"  FINAL LOGIT (Z):   " << z << std::endl;
     std::wcout << L"  FINAL PROBABILITY: " << prob << std::endl;
-    std::wcout << L"---------------------------------------\n"; */
+    std::wcout << L"---------------------------------------\n";
 
     return prob;
 }

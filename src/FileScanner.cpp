@@ -10,7 +10,7 @@ file_features extract_file_features(const fs::directory_entry &entry)
     file_features features;
     std::error_code ec;
 
-    features.path = entry.path().wstring();
+    features.path = entry.path().parent_path().wstring();
     features.name = entry.path().filename().wstring();
     features.extension = entry.path().extension().wstring();
 
@@ -39,7 +39,7 @@ file_features extract_file_features(const fs::directory_entry &entry)
 
 void print_file_features(const file_features &features)
 {
-    std::wcout << L"[SCAN] " << features.path << std::endl;
+    std::wcout << L"[SCAN] " << features.path << L"\\" << features.name << std::endl;
     std::wcout << L"  - Name: " << features.name << std::endl;
     std::wcout << L"  - Type: " << features.extension << std::endl;
     std::wcout << L"  - Size: " << features.file_size << L" bytes\n";
