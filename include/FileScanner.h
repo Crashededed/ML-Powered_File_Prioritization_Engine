@@ -15,10 +15,28 @@ struct file_features
     bool is_read_only;
 };
 
-// Extracts features from a single file entry
-file_features extract_file_features(const fs::directory_entry& entry);
+struct scoredFile
+{
+    file_features file;
+    double score;
 
-void print_file_features(const file_features& features);
+    // Greater-than operator 
+    bool operator>(const scoredFile& other) const {
+        return score > other.score;
+    }
+    
+    // Less-than operator 
+    bool operator<(const scoredFile& other) const {
+        return score < other.score;
+    }
+
+    //todo: add equality operator if needed
+};
+
+// Extracts features from a single file entry
+file_features extract_file_features(const fs::directory_entry &entry);
+
+void print_file_features(const file_features &features);
 
 // Returns a vector containing features for ALL files in the directory
-std::vector<file_features> scan_directory(const std::wstring& target_path);
+std::vector<file_features> scan_directory(const std::wstring &target_path);

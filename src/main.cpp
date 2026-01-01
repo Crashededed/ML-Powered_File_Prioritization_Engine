@@ -5,6 +5,8 @@
 
 #include "../include/FileScanner.h"
 #include "../include/ModelScorer.h"
+#include <queue>
+#include "main.h"
 namespace fs = std::filesystem;
 namespace Chrono = std::chrono;
 
@@ -27,38 +29,95 @@ void report_scan_metrics(size_t total_files, TimePoint start_time, TimePoint end
   std::wcout << L"=================================\n";
 }
 
+void test_specific_file()
+{
+  // Check the score of a specific file
+  file_features test_file = {
+      L"C:\\Users\\benjamin50\\Downloads", // path
+      L"establish.key",                    // name
+      L".key",                             // extension
+      841,                                 // file_size
+      1750679372,                          // last_write_time
+      false                                // is_read_only
+  };
+
+  double test_score = calculate_file_score(test_file);
+  std::wcout << L"\nTest File Score: " << test_score << std::endl;
+}
+
+const wchar_t *TARGET_PATH = L"D:\\downloads";
+const int N_SAMPLES = 50;
+
 int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
-  const wchar_t *target_path = L"D:\\downloads";
 
   // scan directory
-  std::wcout << L"Scanning directory: " << target_path << std::endl;
-  std::vector<file_features> files = scan_directory(target_path);
-  std::wcout << L"Found " << files.size() << L" files. Scoring now...\n" << std::endl;
+  std::wcout << L"Scanning directory: " << TARGET_PATH << std::endl;
+  std::vector<file_features> files = scan_directory(TARGET_PATH);
+  std::wcout << L"Found " << files.size() << L" files. Scoring now...\n"
+             << std::endl;
 
-  // Iterate through files and score them
+  // allocate heaps for top N and bottom N scored files
+  std::priority_queue<scoredFile, std::vector<scoredFile>, std::greater<scoredFile>> top_n_heap;
+  std::priority_queue<scoredFile, std::vector<scoredFile>, std::less<scoredFile>> bottom_n_heap;
+
+  // score each file and maintain top N and bottom N heaps
   for (const auto &file : files)
   {
     double score = calculate_file_score(file);
+    scoredFile sfile{file, score};
 
-    // Filter output to keep it readable
-    if (score > 0.85)
-      std::wcout << L"[HIGH VALUE] " << file.path << L"\\" << file.name  << L" (Score: " << score << L")" << std::endl;
+    // --- Logic for Top N ---
+    if (top_n_heap.size() < N_SAMPLES) // if we haven't filled the heap yet - push directly
+      top_n_heap.push(sfile);
+
+    else if (sfile > top_n_heap.top()) // if current score is greater than the smallest in the heap - insert it
+    {
+      top_n_heap.pop();
+      top_n_heap.push(sfile);
+    }
+
+    // --- Logic for Bottom N ---
+    if (bottom_n_heap.size() < N_SAMPLES) // if we haven't filled the heap yet - push directly
+      bottom_n_heap.push(sfile);
+
+    else if (sfile < bottom_n_heap.top()) // if current score is smaller than the largest in the heap - insert it
+    {
+      bottom_n_heap.pop();
+      bottom_n_heap.push(sfile);
+    }
   }
 
-  // // Check the score of a specific file
-  // file_features test_file = {
-  //     L"C:\\Users\\benjamin50\\Downloads", // path
-  //     L"establish.key",                    // name
-  //     L".key",                             // extension
-  //     841,                                 // file_size
-  //     1750679372,                          // last_write_time
-  //     false                                // is_read_only
-  // };
+  std::vector<scoredFile> top_files;
+  std::vector<scoredFile> bottom_files;
 
-  // double test_score = calculate_file_score(test_file);
-  // std::wcout << L"\nTest File Score: " << test_score << std::endl;
+  while (!top_n_heap.empty())
+  {
+    top_files.push_back(top_n_heap.top());
+    top_n_heap.pop();
+  }
+  std::reverse(top_files.begin(), top_files.end());
 
-  // return 0;
+  while (!bottom_n_heap.empty())
+  {
+    bottom_files.push_back(bottom_n_heap.top());
+    bottom_n_heap.pop();
+  }
+  std::reverse(bottom_files.begin(), bottom_files.end());
+
+  std::wcout << L"       PAYLOAD SUMMARY (Top/Bot " << N_SAMPLES << L")" << std::endl;
+  std::wcout << L"--- TOP " << N_SAMPLES << L" HIGH SIGNAL FILES ---" << std::endl;
+  for (const auto &sf : top_files)
+  {
+    std::wcout << L"Score: " << sf.score << L" | " << sf.file.path << L"\\" << sf.file.name << std::endl;
+  }
+
+  std::wcout << L"\n--- BOTTOM " << N_SAMPLES << L" NOISE FILES ---" << std::endl;
+  for (const auto &sf : bottom_files)
+  {
+    std::wcout << L"Score: " << sf.score << L" | " << sf.file.path << L"\\" << sf.file.name << std::endl;
+  }
+
+  return 0;
 }

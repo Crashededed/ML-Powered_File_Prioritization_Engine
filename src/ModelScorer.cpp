@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 
+//todo: match half life to python
 static double compute_recency_score(unsigned long last_write_time)
 {
     double secs_in_day = 60.0 * 60.0 * 24.0;
@@ -15,7 +16,6 @@ static double compute_recency_score(unsigned long last_write_time)
 
 static bool is_valuable_ext(const std::wstring &extension)
 {
-    // todo: switch to json or config file
     return HIGH_VAL_EXTS.find(extension) != HIGH_VAL_EXTS.end();
 }
 
