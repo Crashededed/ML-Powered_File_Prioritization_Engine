@@ -122,7 +122,7 @@ ModelContext FINANCE_CONTEXT = ModelContext{L"FINANCE", FINANCE_MODEL_WEIGHTS, F
 ModelContext HR_CONTEXT = ModelContext{L"HR", HR_MODEL_WEIGHTS, HR_MODEL_BIAS, HR_HIGH_VAL_EXTS, HR_JUNK_EXTS};
 ModelContext IT_CONTEXT = ModelContext{L"IT", IT_MODEL_WEIGHTS, IT_MODEL_BIAS, IT_HIGH_VAL_EXTS, IT_JUNK_EXTS};
 
-int main()
+/* int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
 
@@ -149,17 +149,17 @@ int main()
   }
 
   return 0;
-}
+} */
 
-/* int main()
+int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
   test_specific_file(L"D:\\downloads\\budget_2025.xlsx", FINANCE_CONTEXT);
-  test_specific_file(L"D:\\downloads\\Audio-Win10_Win11-6.0.9360.1\\Win64\\Realtek\\AlexaConfigExtension_9360\\alexaconfig.cat", GENERAL_CONTEXT);
-  test_specific_file(L"D:\\downloads\\Skeleton.tar\\Skeleton\\src\\main\\java\\bgu\\spl\\mics\\example\\services\\ExampleEventHandlerService.java", FINANCE_CONTEXT);
-  test_specific_file(L"D:\\downloads\\Skeleton.tar\\Skeleton\\src\\main\\java\\bgu\\spl\\mics\\application\\objects\\LiDarDataBase.java", HR_CONTEXT);
-  test_specific_file(L"D:\\downloads\\Audio-Win10_Win11-6.0.9360.1\\Win64\\Realtek\\AlexaConfigExtension_9360\\alexaconfig.cat", IT_CONTEXT);
-  test_specific_file(L"D:\\downloads\\Skeleton\\Skeleton\\.vscode\\settings.json", IT_CONTEXT);
+  // test_specific_file(L"D:\\downloads\\Audio-Win10_Win11-6.0.9360.1\\Win64\\Realtek\\AlexaConfigExtension_9360\\alexaconfig.cat", GENERAL_CONTEXT);
+  // test_specific_file(L"D:\\downloads\\Skeleton.tar\\Skeleton\\src\\main\\java\\bgu\\spl\\mics\\example\\services\\ExampleEventHandlerService.java", FINANCE_CONTEXT);
+  // test_specific_file(L"D:\\downloads\\Skeleton.tar\\Skeleton\\src\\main\\java\\bgu\\spl\\mics\\application\\objects\\LiDarDataBase.java", HR_CONTEXT);
+  // test_specific_file(L"D:\\downloads\\Audio-Win10_Win11-6.0.9360.1\\Win64\\Realtek\\AlexaConfigExtension_9360\\alexaconfig.cat", IT_CONTEXT);
+  // test_specific_file(L"D:\\downloads\\Skeleton\\Skeleton\\.vscode\\settings.json", IT_CONTEXT);
 
   return 0;
-} */
+}
