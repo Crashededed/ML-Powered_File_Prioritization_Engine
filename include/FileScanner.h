@@ -11,7 +11,7 @@ struct file_features
     std::wstring name;
     std::wstring extension;
     unsigned long file_size;
-    unsigned long last_write_time; // Age in seconds
+    unsigned long age_in_seconds; 
     bool is_read_only;
 };
 

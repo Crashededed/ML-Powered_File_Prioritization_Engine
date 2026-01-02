@@ -24,11 +24,11 @@ file_features extract_file_features(const fs::directory_entry &entry)
         //   Convert to seconds since last write
         auto toNow = fs::file_time_type::clock::now() - last_write;
         auto elapsedSec = Chrono::duration_cast<Chrono::seconds>(toNow).count();
-        features.last_write_time = static_cast<unsigned long>(elapsedSec);
+        features.age_in_seconds = static_cast<unsigned long>(elapsedSec);
     }
     else
     {
-        features.last_write_time = 0;
+        features.age_in_seconds = 0;
     }
 
     auto perms = entry.status(ec).permissions();
@@ -43,7 +43,7 @@ void print_file_features(const file_features &features)
     std::wcout << L"  - Name: " << features.name << std::endl;
     std::wcout << L"  - Type: " << features.extension << std::endl;
     std::wcout << L"  - Size: " << features.file_size << L" bytes\n";
-    std::wcout << L"  - Mod Time: " << features.last_write_time << L" seconds ago\n";
+    std::wcout << L"  - Mod Time: " << features.age_in_seconds << L" seconds ago\n";
     std::wcout << L"  - Read Only: " << (features.is_read_only ? L"Yes" : L"No") << std::endl;
     std::wcout << L"-----------------------------------\n";
 }
