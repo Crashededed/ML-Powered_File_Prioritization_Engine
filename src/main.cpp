@@ -122,7 +122,7 @@ ModelContext FINANCE_CONTEXT = ModelContext{L"FINANCE", FINANCE_MODEL_WEIGHTS, F
 ModelContext HR_CONTEXT = ModelContext{L"HR", HR_MODEL_WEIGHTS, HR_MODEL_BIAS, HR_HIGH_VAL_EXTS, HR_JUNK_EXTS};
 ModelContext IT_CONTEXT = ModelContext{L"IT", IT_MODEL_WEIGHTS, IT_MODEL_BIAS, IT_HIGH_VAL_EXTS, IT_JUNK_EXTS};
 
-/* int main()
+int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
 
@@ -131,7 +131,7 @@ ModelContext IT_CONTEXT = ModelContext{L"IT", IT_MODEL_WEIGHTS, IT_MODEL_BIAS, I
                                        HR_CONTEXT,
                                        IT_CONTEXT};
 
-  const wchar_t *TARGET_PATH = L"D:\\downloads";
+  const wchar_t *TARGET_PATH = L"C:\\CyberProjectTestData";
   std::wcout << L"Scanning directory: " << TARGET_PATH << std::endl;
 
   std::vector<file_features> files = scan_directory(TARGET_PATH);
@@ -149,9 +149,9 @@ ModelContext IT_CONTEXT = ModelContext{L"IT", IT_MODEL_WEIGHTS, IT_MODEL_BIAS, I
   }
 
   return 0;
-} */
+}
 
-int main()
+/* int main()
 {
   _setmode(_fileno(stdout), _O_U16TEXT);
   test_specific_file(L"D:\\downloads\\budget_2025.xlsx", FINANCE_CONTEXT);
@@ -162,4 +162,4 @@ int main()
   // test_specific_file(L"D:\\downloads\\Skeleton\\Skeleton\\.vscode\\settings.json", IT_CONTEXT);
 
   return 0;
-}
+} */
