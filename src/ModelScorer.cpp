@@ -8,10 +8,14 @@
 
 static double compute_recency_score(unsigned long age_in_seconds)
 {
-    //todo: switch to system clock if issues arise
-    // Using a half-life of 90 days for recency scoring
-    double secs_in_day = 60.0 * 60.0 * 24.0;
-    return 1.0 / (static_cast<double>(age_in_seconds) / (90.0 * secs_in_day) + 1.0);
+    const double HALF_LIFE_DAYS = 365.0; 
+    const double SECS_IN_DAY = 86400.0;
+
+    double age_days = static_cast<double>(age_in_seconds) / SECS_IN_DAY;
+    
+    // This formula ensures a file exactly 1 year old (365 days) 
+    // yields a feature value of 0.5, matching your training boundary.
+    return 1.0 / (age_days / HALF_LIFE_DAYS + 1.0);
 }
 
 static int is_valuable_ext(const std::wstring &extension, const std::unordered_set<std::wstring> &high_val_exts)

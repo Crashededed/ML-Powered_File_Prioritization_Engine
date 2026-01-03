@@ -1,8 +1,6 @@
 #include "../include/FileScanner.h"
 #include <iostream>
-#include <chrono>
 
-namespace Chrono = std::chrono;
 
 // Internal helper to extract details from a single entry
 file_features extract_file_features(const fs::directory_entry &entry)
@@ -20,16 +18,18 @@ file_features extract_file_features(const fs::directory_entry &entry)
     auto last_write = entry.last_write_time(ec);
     if (!ec)
     {
-        // todo: consider switching to system_clock if issues arise(python uses unix epoch time)
-        //   Convert to seconds since last write
-        auto toNow = fs::file_time_type::clock::now() - last_write;
-        auto elapsedSec = Chrono::duration_cast<Chrono::seconds>(toNow).count();
-        features.age_in_seconds = static_cast<unsigned long>(elapsedSec);
+        if (last_write >= REF_FILE_TIME)
+            features.age_in_seconds = 0;
+        else
+        {
+            // Correct distance calculation
+            auto toRef = REF_FILE_TIME - last_write;
+            features.age_in_seconds = static_cast<unsigned long>(
+                Chrono::duration_cast<Chrono::seconds>(toRef).count());
+        }
     }
     else
-    {
         features.age_in_seconds = 0;
-    }
 
     auto perms = entry.status(ec).permissions();
     features.is_read_only = ec ? false : (perms & fs::perms::owner_write) == fs::perms::none;

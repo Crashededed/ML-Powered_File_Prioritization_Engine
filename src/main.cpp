@@ -131,6 +131,7 @@ int main()
                                        HR_CONTEXT,
                                        IT_CONTEXT};
 
+  // const wchar_t *TARGET_PATH = L"D:\\downloads";
   const wchar_t *TARGET_PATH = L"C:\\CyberProjectTestData";
   std::wcout << L"Scanning directory: " << TARGET_PATH << std::endl;
 
