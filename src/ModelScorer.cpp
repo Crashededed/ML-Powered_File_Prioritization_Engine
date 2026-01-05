@@ -49,7 +49,7 @@ static double accumulate_hashing_weights(const std::wstring &w_input, const std:
         uint32_t h = murmur3_32(trigram.c_str(), 4, 0);
         int absolute_h = std::abs(static_cast<int>(h)); // in order to match Python's hash behavior apply absolute
 
-        int feature_index = absolute_h % 1024;
+        int feature_index = absolute_h % 2048;
         hashed_weight_sum += model_weights[weight_offset + feature_index];
     }
 
@@ -78,9 +78,9 @@ double calculate_file_score(const file_features &features, ModelContext context,
     double z_path_depth = (context.weights[6] * path_depth);
     z += z_recency + z_size + z_ext + z_junk_ext + z_name_len + z_path_len + z_path_depth;
 
-    // Add Hashing Features (Weights 3-1026 for name, 1027-2050 for path)
+    // Add Hashing Features (Weights 7-2054 for name, 2055-4102 for path)
     double z_name = accumulate_hashing_weights(features.name, context.weights, 7);
-    double z_path = accumulate_hashing_weights(features.path, context.weights, 1031);
+    double z_path = accumulate_hashing_weights(features.path, context.weights, 2055);
     z += z_name;
     z += z_path;
 

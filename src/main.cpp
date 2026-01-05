@@ -115,7 +115,7 @@ void test_specific_file(wchar_t *TARGET_PATH, ModelContext context)
   double test_score = calculate_file_score(f, context, true);
 }
 
-const int N_SAMPLES = 5;
+const int N_SAMPLES = 10;
 
 ModelContext GENERAL_CONTEXT = ModelContext{L"GENERAL", GENERAL_MODEL_WEIGHTS, GENERAL_MODEL_BIAS, GENERAL_HIGH_VAL_EXTS, GENERAL_JUNK_EXTS};
 ModelContext FINANCE_CONTEXT = ModelContext{L"FINANCE", FINANCE_MODEL_WEIGHTS, FINANCE_MODEL_BIAS, FINANCE_HIGH_VAL_EXTS, FINANCE_JUNK_EXTS};
@@ -132,7 +132,7 @@ int main()
                                        IT_CONTEXT};
 
   // const wchar_t *TARGET_PATH = L"D:\\downloads";
-  const wchar_t *TARGET_PATH = L"C:\\CyberProjectTestData";
+  const wchar_t *TARGET_PATH = L"C:\\MLData";
   std::wcout << L"Scanning directory: " << TARGET_PATH << std::endl;
 
   std::vector<file_features> files = scan_directory(TARGET_PATH);
