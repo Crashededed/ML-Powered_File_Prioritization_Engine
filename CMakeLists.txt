@@ -4,7 +4,6 @@ project(Payload)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-
 # Apply the standard static runtime library setting.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 

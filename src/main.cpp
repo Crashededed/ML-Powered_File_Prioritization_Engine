@@ -147,7 +147,13 @@ int main()
 
   std::vector<ModelContext> targets =
       {GENERAL_CONTEXT, FINANCE_CONTEXT, HR_CONTEXT, IT_CONTEXT};
-  const wchar_t *TARGET_PATH = L"D:\\MLDATA";
+  const wchar_t *TARGET_PATH = L"./test_data";
+
+  if (!fs::exists(TARGET_PATH) || !fs::is_directory(TARGET_PATH))
+  {
+    std::wcout << L"Error: Specified path does not exist or is not a directory." << std::endl;
+    return 1;
+  }
 
   std::wcout << L"Scanning directory: " << TARGET_PATH << std::endl;
 
@@ -155,6 +161,12 @@ int main()
   auto start_extraction = Clock::now();
   std::vector<file_features> files = scan_directory(TARGET_PATH);
   auto end_extraction = Clock::now();
+
+  if (files.empty())
+  {
+    std::wcout << L"No files found in the specified directory." << std::endl;
+    return 0;
+  }
 
   std::wcout << L"Found " << files.size() << L" files. Scoring now...\n\n";
 

@@ -50,3 +50,4 @@ CyberSecurityMLproject.vcxproj.user
 /data
 *.xml
 *.parquet
+test_data
