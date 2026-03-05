@@ -51,3 +51,6 @@ CyberSecurityMLproject.vcxproj.user
 *.xml
 *.parquet
 test_data
+dev
+.venv
+.vscode
