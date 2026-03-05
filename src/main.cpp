@@ -15,19 +15,14 @@ using Clock = Chrono::high_resolution_clock;
 using TimePoint = Clock::time_point;
 using Duration = Chrono::duration<double, std::milli>;
 
-void report_scan_metrics(size_t total_files, TimePoint start_time, TimePoint end_time)
-{
-  Duration duration_ms = end_time - start_time;
+// Number of top and bottom files to display for each target context
+const int N_SAMPLES = 10;
 
-  double total_time_ms = duration_ms.count();
-  double avg_time_per_file = (total_files > 0) ? (total_time_ms / total_files) : 0.0;
-
-  std::wcout << L"\n========== SCAN REPORT ==========\n";
-  std::wcout << L"Total Files Scanned: " << total_files << std::endl;
-  std::wcout << L"Total Time Taken:    " << std::fixed << std::setprecision(2) << total_time_ms << L" ms\n";
-  std::wcout << L"Average Time/File:   " << std::fixed << std::setprecision(4) << avg_time_per_file << L" ms\n";
-  std::wcout << L"=================================\n";
-}
+// Define model contexts for each target with their respective weights, biases, and extension sets
+ModelContext GENERAL_CONTEXT = ModelContext{L"GENERAL", GENERAL_MODEL_WEIGHTS, GENERAL_MODEL_BIAS, GENERAL_HIGH_VAL_EXTS, GENERAL_JUNK_EXTS};
+ModelContext FINANCE_CONTEXT = ModelContext{L"FINANCE", FINANCE_MODEL_WEIGHTS, FINANCE_MODEL_BIAS, FINANCE_HIGH_VAL_EXTS, FINANCE_JUNK_EXTS};
+ModelContext HR_CONTEXT = ModelContext{L"HR", HR_MODEL_WEIGHTS, HR_MODEL_BIAS, HR_HIGH_VAL_EXTS, HR_JUNK_EXTS};
+ModelContext IT_CONTEXT = ModelContext{L"IT", IT_MODEL_WEIGHTS, IT_MODEL_BIAS, IT_HIGH_VAL_EXTS, IT_JUNK_EXTS};
 
 struct RankingResult
 {
@@ -35,6 +30,7 @@ struct RankingResult
   std::vector<scoredFile> bottom_files;
 };
 
+// Ranks files based on their scores and returns the top N and bottom N files for a given target context
 RankingResult rank_files(const std::vector<file_features> &files, ModelContext context, int n_samples)
 {
   // allocate heaps for top N and bottom N scored files
@@ -47,7 +43,7 @@ RankingResult rank_files(const std::vector<file_features> &files, ModelContext c
     double score = calculate_file_score(file, context, false);
     scoredFile sfile{file, score};
 
-    // --- Logic for Top N ---
+    // Logic for Top N
     if (top_n_heap.size() < n_samples) // if we haven't filled the heap yet - push directly
       top_n_heap.push(sfile);
 
@@ -57,7 +53,7 @@ RankingResult rank_files(const std::vector<file_features> &files, ModelContext c
       top_n_heap.push(sfile);
     }
 
-    // --- Logic for Bottom N ---
+    // Logic for Bottom N
     if (bottom_n_heap.size() < n_samples) // if we haven't filled the heap yet - push directly
       bottom_n_heap.push(sfile);
 
@@ -71,6 +67,7 @@ RankingResult rank_files(const std::vector<file_features> &files, ModelContext c
   std::vector<scoredFile> top_files;
   std::vector<scoredFile> bottom_files;
 
+  // Extract files from heaps into vectors and reverse to get correct order
   while (!top_n_heap.empty())
   {
     top_files.push_back(top_n_heap.top());
@@ -88,6 +85,7 @@ RankingResult rank_files(const std::vector<file_features> &files, ModelContext c
   return RankingResult{top_files, bottom_files};
 }
 
+// Utility function to print the top and bottom ranked files for a given target context
 void print_target_rankings(const RankingResult &ranking, const std::wstring &target_name, int n_samples)
 {
   std::wcout << L"ANALYZING TARGET: " << target_name << std::endl;
@@ -107,6 +105,7 @@ void print_target_rankings(const RankingResult &ranking, const std::wstring &tar
   std::wcout << std::endl;
 }
 
+// Function to test scoring of a specific file for debugging purposes
 void test_specific_file(wchar_t *TARGET_PATH, ModelContext context)
 {
   file_features f = extract_file_features(fs::directory_entry(TARGET_PATH));
@@ -115,31 +114,52 @@ void test_specific_file(wchar_t *TARGET_PATH, ModelContext context)
   double test_score = calculate_file_score(f, context, true);
 }
 
-const int N_SAMPLES = 10;
+// Function to report performance metrics in a clear format
+void report_metrics(size_t total_files,
+                    TimePoint start_discovery, TimePoint end_discovery,
+                    TimePoint start_inference, TimePoint end_inference)
+{
+  double discovery_ms = Duration(end_discovery - start_discovery).count();
+  double total_inference_ms = Duration(end_inference - start_inference).count();
 
-ModelContext GENERAL_CONTEXT = ModelContext{L"GENERAL", GENERAL_MODEL_WEIGHTS, GENERAL_MODEL_BIAS, GENERAL_HIGH_VAL_EXTS, GENERAL_JUNK_EXTS};
-ModelContext FINANCE_CONTEXT = ModelContext{L"FINANCE", FINANCE_MODEL_WEIGHTS, FINANCE_MODEL_BIAS, FINANCE_HIGH_VAL_EXTS, FINANCE_JUNK_EXTS};
-ModelContext HR_CONTEXT = ModelContext{L"HR", HR_MODEL_WEIGHTS, HR_MODEL_BIAS, HR_HIGH_VAL_EXTS, HR_JUNK_EXTS};
-ModelContext IT_CONTEXT = ModelContext{L"IT", IT_MODEL_WEIGHTS, IT_MODEL_BIAS, IT_HIGH_VAL_EXTS, IT_JUNK_EXTS};
+  double avg_discovery_per_file = (total_files > 0) ? (discovery_ms / total_files) : 0.0;
+  double avg_inference_per_target = total_inference_ms / 4;
+  double inference_per_file_per_target = (total_files > 0) ? (avg_inference_per_target / total_files) : 0.0;
+
+  std::wcout << L"\n========== PERFORMANCE BREAKDOWN ==========\n";
+  std::wcout << L"Total Files Processed:   " << total_files << std::endl;
+  std::wcout << L"--------------------------------------------\n";
+  std::wcout << L"1. EXTRACTING (I/O & Hashing)\n";
+  std::wcout << L"   Total Time:           " << std::fixed << std::setprecision(2) << discovery_ms << L" ms\n";
+  std::wcout << L"   Avg per File:         " << std::fixed << std::setprecision(4) << avg_discovery_per_file << L" ms\n";
+  std::wcout << L"--------------------------------------------\n";
+  std::wcout << L"2. INFERENCE (ML Scoring - " << 4 << L" Targets)\n";
+  std::wcout << L"   Total Inference Time: " << std::fixed << std::setprecision(2) << total_inference_ms << L" ms\n";
+  std::wcout << L"   Avg per Target:       " << std::fixed << std::setprecision(2) << avg_inference_per_target << L" ms\n";
+  std::wcout << L"   Avg per File/Target:  " << std::fixed << std::setprecision(6) << inference_per_file_per_target << L" ms\n";
+  std::wcout << L"============================================\n";
+}
 
 int main()
 {
+  // Set console output to UTF-16 to properly display wide characters(hebrew chars, etc.)
   _setmode(_fileno(stdout), _O_U16TEXT);
 
-  std::vector<ModelContext> targets = {GENERAL_CONTEXT,
-                                       FINANCE_CONTEXT,
-                                       HR_CONTEXT,
-                                       IT_CONTEXT};
+  std::vector<ModelContext> targets =
+      {GENERAL_CONTEXT, FINANCE_CONTEXT, HR_CONTEXT, IT_CONTEXT};
+  const wchar_t *TARGET_PATH = L"D:\\MLDATA";
 
-  // const wchar_t *TARGET_PATH = L"D:\\downloads";
-  const wchar_t *TARGET_PATH = L"C:\\MLData";
   std::wcout << L"Scanning directory: " << TARGET_PATH << std::endl;
 
+  // File discovery and feature extraction, metrics
+  auto start_extraction = Clock::now();
   std::vector<file_features> files = scan_directory(TARGET_PATH);
+  auto end_extraction = Clock::now();
 
-  std::wcout << L"Found " << files.size() << L" files. Scoring now...\n"
-             << std::endl;
+  std::wcout << L"Found " << files.size() << L" files. Scoring now...\n\n";
 
+  // Inference and ranking per context, metrics
+  auto start_inference = Clock::now();
   for (ModelContext &context : targets)
   {
     RankingResult result = rank_files(files, context, N_SAMPLES);
@@ -148,19 +168,9 @@ int main()
     scoredFile highest_scored_file = result.top_files.front();
     calculate_file_score(highest_scored_file.file, context, true);
   }
+  auto end_inference = Clock::now();
+
+  report_metrics(files.size(), start_extraction, end_extraction, start_inference, end_inference);
 
   return 0;
 }
-
-/* int main()
-{
-  _setmode(_fileno(stdout), _O_U16TEXT);
-  test_specific_file(L"D:\\downloads\\budget_2025.xlsx", FINANCE_CONTEXT);
-  // test_specific_file(L"D:\\downloads\\Audio-Win10_Win11-6.0.9360.1\\Win64\\Realtek\\AlexaConfigExtension_9360\\alexaconfig.cat", GENERAL_CONTEXT);
-  // test_specific_file(L"D:\\downloads\\Skeleton.tar\\Skeleton\\src\\main\\java\\bgu\\spl\\mics\\example\\services\\ExampleEventHandlerService.java", FINANCE_CONTEXT);
-  // test_specific_file(L"D:\\downloads\\Skeleton.tar\\Skeleton\\src\\main\\java\\bgu\\spl\\mics\\application\\objects\\LiDarDataBase.java", HR_CONTEXT);
-  // test_specific_file(L"D:\\downloads\\Audio-Win10_Win11-6.0.9360.1\\Win64\\Realtek\\AlexaConfigExtension_9360\\alexaconfig.cat", IT_CONTEXT);
-  // test_specific_file(L"D:\\downloads\\Skeleton\\Skeleton\\.vscode\\settings.json", IT_CONTEXT);
-
-  return 0;
-} */

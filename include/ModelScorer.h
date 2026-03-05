@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <string>
 
+// Context struct to hold model parameters and weights
 struct ModelContext {
     std::wstring target; 
     const std::vector<double>& weights;

@@ -7,6 +7,7 @@
 namespace fs = std::filesystem;
 namespace Chrono = std::chrono;
 
+// Struct to hold extracted features from a file
 struct file_features
 {
     std::wstring path;
@@ -17,6 +18,7 @@ struct file_features
     bool is_read_only;
 };
 
+// Struct to hold a file along with its calculated score for ranking purposes
 struct scoredFile
 {
     file_features file;
@@ -31,8 +33,6 @@ struct scoredFile
     bool operator<(const scoredFile& other) const {
         return score < other.score;
     }
-
-    //todo: add equality operator if needed
 };
 
 // Reference time point for age calculations (Jan 1, 2026)
@@ -44,7 +44,7 @@ static fs::file_time_type get_ref_point()
     auto now_file = fs::file_time_type::clock::now();
     auto ref_sys = Chrono::system_clock::from_time_t(static_cast<time_t>(REF_DATE_UNIX));
 
-    // Distance from "Now" to "Jan 2026"
+    // Duration from "Now" to "Jan 2026"
     auto diff = ref_sys - now_sys;
     return now_file + Chrono::duration_cast<fs::file_time_type::duration>(diff);
 }
@@ -54,6 +54,7 @@ static const fs::file_time_type REF_FILE_TIME = get_ref_point();
 // Extracts features from a single file entry
 file_features extract_file_features(const fs::directory_entry &entry);
 
+// Utility function to print the extracted features of a file in a readable format
 void print_file_features(const file_features &features);
 
 // Returns a vector containing features for ALL files in the directory

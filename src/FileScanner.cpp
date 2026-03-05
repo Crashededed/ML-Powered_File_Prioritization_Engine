@@ -1,8 +1,6 @@
 #include "../include/FileScanner.h"
 #include <iostream>
 
-
-// Internal helper to extract details from a single entry
 file_features extract_file_features(const fs::directory_entry &entry)
 {
     file_features features;
@@ -22,7 +20,7 @@ file_features extract_file_features(const fs::directory_entry &entry)
             features.age_in_seconds = 0;
         else
         {
-            // Correct distance calculation
+            // duration calculation
             auto toRef = REF_FILE_TIME - last_write;
             features.age_in_seconds = static_cast<unsigned long>(
                 Chrono::duration_cast<Chrono::seconds>(toRef).count());

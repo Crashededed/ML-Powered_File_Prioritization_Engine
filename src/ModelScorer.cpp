@@ -6,33 +6,35 @@
 #include <string>
 #include <iostream>
 
+// Computes a recency score based on the age of the file, with a half-life of 1 year (365 days)
 static double compute_recency_score(unsigned long age_in_seconds)
 {
-    const double HALF_LIFE_DAYS = 365.0; 
+    const double HALF_LIFE_DAYS = 365.0;
     const double SECS_IN_DAY = 86400.0;
 
     double age_days = static_cast<double>(age_in_seconds) / SECS_IN_DAY;
-    
-    // This formula ensures a file exactly 1 year old (365 days) 
+
+    // This formula ensures a file exactly 1 year old (365 days)
     // yields a feature value of 0.5, matching your training boundary.
     return 1.0 / (age_days / HALF_LIFE_DAYS + 1.0);
 }
 
+// Checks if the file extension is in the set of valuable extensions for the context
 static int is_valuable_ext(const std::wstring &extension, const std::unordered_set<std::wstring> &high_val_exts)
 {
     return high_val_exts.find(extension) != high_val_exts.end() ? 1 : 0;
 }
 
+// Checks if the file extension is in the set of junk extensions for the context
 static int is_junk_ext(const std::wstring &extension, const std::unordered_set<std::wstring> &junk_exts)
 {
     return junk_exts.find(extension) != junk_exts.end() ? 1 : 0;
 }
 
-// function iterates over trigrams of input string, hashes them, and accumulates weights
+// function iterates over quadgrams of input string, hashes them, and accumulates weights
 static double accumulate_hashing_weights(const std::wstring &w_input, const std::vector<double> &model_weights, int weight_offset)
 {
-    // todo: could cause loss of data
-    //  Convert to UTF-8 string to match Python hashing
+    // lossy conversion from wide string to narrow string for hashing
     std::string input(w_input.begin(), w_input.end());
 
     for (char &c : input)
@@ -45,8 +47,8 @@ static double accumulate_hashing_weights(const std::wstring &w_input, const std:
 
     for (size_t i = 0; i <= input.length() - 4; ++i)
     {
-        std::string trigram = input.substr(i, 4);
-        uint32_t h = murmur3_32(trigram.c_str(), 4, 0);
+        std::string quadgram = input.substr(i, 4);
+        uint32_t h = murmur3_32(quadgram.c_str(), 4, 0);
         int absolute_h = std::abs(static_cast<int>(h)); // in order to match Python's hash behavior apply absolute
 
         int feature_index = absolute_h % 2048;
@@ -56,6 +58,7 @@ static double accumulate_hashing_weights(const std::wstring &w_input, const std:
     return hashed_weight_sum;
 }
 
+// Main function to calculate the score of a file based on its features and the given model context
 double calculate_file_score(const file_features &features, ModelContext context, bool debug_mode)
 {
     double z = context.bias;
@@ -105,7 +108,7 @@ double calculate_file_score(const file_features &features, ModelContext context,
     }
     return prob;
 }
-// MurmurHash3_x86_32 implementation for consistency with sklearn
+// MurmurHash3_x86_32 implementation for consistency with scikit-learn's hashing
 uint32_t murmur3_32(const char *key, uint32_t len, uint32_t seed)
 {
     static const uint32_t c1 = 0xcc9e2d51;
