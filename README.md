@@ -1,0 +1,157 @@
+## 🎯 Project Overview
+
+In modern cyber operations, the challenge of data exfiltration is often defined by constraints: limited time windows, restrictive network bandwidth, and the constant threat of detection by behavioral-based security systems. Traditional methods that rely on keyword matching or deep-content scanning are often too slow and create a massive CPU footprint that triggers modern Endpoint Detection and Response (EDR) alerts.
+
+This project introduces a sophisticated alternative: **A metadata-centric machine learning engine designed to rank and prioritize High-Value Targets (HVTs)** with zero file-content interaction, designed for maximum stealth and precision.
+
+By shifting the focus from file content to file metadata and directory structure, our system identifies high-value sensitive files while remaining entirely lightweight and fast. Using machine learning to analyze filenames, folder hierarchies, and modification histories, the engine predicts file value with high accuracy without ever needing to open a single document.
+
+---
+
+## 🛠️ Key Technical Pillars 
+
+### Multi-Target Classification
+The engine is built for flexibility, featuring specialized models for **Finance**, **HR**, and **IT** targets to ensure the most relevant assets are surfaced immediately.
+
+### Zero-Dependency Portability
+The entire inference engine is compiled into a lightweight C++ binary with no external requirements - no Python environment, PyTorch libraries, or external DLLs are needed for deployment. This ensures a negligible forensic footprint and allows the payload to perform real-time scoring using only the pre-trained weights.
+
+### Trained on Real-World Data
+The models were developed using a high-entropy dataset constructed from authentic corporate filesystem snapshots, public US government documents (GovDocs), and diverse GitHub repositories. By training on these real-world naming conventions and directory hierarchies, the system learns to distinguish between mundane system files and genuine high-value assets with high precision.
+
+### Dual-Component Architecture
+
+#### Python Training Module
+Employs feature engineering and **Logistic Regression** to learn the distinction between critical signals and system "noise" from a custom-built dataset.
+This module produces weights and biases for each model. They are then exported directly into C++ header files, bridging the gap between the research environment and the operational payload.
+
+#### C++ Payload
+A lightweight, standalone binary that traverses target drives and performs real-time inference. It extracts metadata on the fly to generate probability scores for each file, enabling the immediate ranking and prioritization of sensitive assets. It requires **zero external libraries or Python environments**, simulating a real-world, self-contained deployment.
+
+---
+
+## 📊 Performance & Results
+
+The system successfully bridges the gap between theoretical machine learning and operational cybersecurity requirements:
+
+- **High Recall:** Achieved detection rates ranging from **0.82 (IT)** to **0.89 (Finance)**, even in highly imbalanced environments where sensitive files are statistically rare.
+
+- **Sub-Millisecond Speed:** The **C++ payload** delivers **sub-millisecond inference speeds per file**, ensuring minimal dwell time on a target system.
+
+- **Stealth-First Design:** Maintains a **negligible CPU footprint** and effectively filters out system noise, making it a viable and stealthy alternative to traditional content-scanning methods.
+
+### Snippet from the Payload - Ranking according to the HR model:
+
+```
+ANALYZING TARGET: HR
+
+--- TOP 5 FILES ---
+Score: 0.9896 | .\test_data\HR\Recruiting\Candidates\Employee_Benefits_2023.xlsx
+Score: 0.9684 | .\test_data\HR\Recruiting\Candidates\Onboarding_Checklist_Product.xlsx
+Score: 0.9616 | .\test_data\HR\Recruiting\Candidates\Salary_Scales_2025_FINAL.xlsx
+Score: 0.9514 | .\test_data\HR\Recruiting\Candidates\Interview_Notes_John_Johnson.docx
+Score: 0.8439 | .\test_data\Users\emily49\OneDrive - Corp\HR\Handbooks\Employee_Benefits_2024.xlsx
+```
+
+## 🧠 Technical Deep Dive: Feature Engineering
+
+This section explains the "secret sauce" that allows the model to identify sensitive files without looking at their contents:
+
+### 1. Structural Text Hashing (Quadgrams)
+
+To "read" file paths without a lookup table, the system breaks strings into overlapping **4-character chunks called quadgrams**. These are processed using the **MurmurHash3** algorithm and mapped to a fixed **2048-feature vector**. This allows the model to mathematically recognize sensitive patterns like **budg** (from *budget*) or **payr** (from *payroll*) regardless of the surrounding text.
+
+### 2. Temporal Decay Logic
+
+Time is a primary indicator of relevance. We implement a **hyperbolic decay function** to calculate a "Recency Score".
+This causes a **"half-life" effect** where a file exactly one year old receives a score of **0.5**. The model learns to prioritize fresh, active data over outdated noise.
+
+### 3. Metadata Heuristics
+
+The engine analyzes several secondary signals to refine its skeptical baseline:
+
+- **Path Depth:** Identifies how deep a file is nested; human-created data tends to be shallower than system-generated junk.
+- **Log-Scaled Size:** We use `log1p` of the file size to prevent massive files from skewing the model's weights while maintaining relative scale.
+- **Target-Specific Extensions:** Binary indicators flag formats like `.xlsx` for Finance or `.pem` for IT.
+
+## ⚙️ Payload Features - Performance-Oriented Engineering:
+
+- **Static Memory Allocation** - Uses priority queues to maintain only the top $N$ files per focus, preventing memory spikes when scanning millions of files.
+
+- **W-Character Support** - Fully compatible with **UTF-16 filenames** (essential for diverse environments containing Hebrew, Russian, or specialized symbols).
+
+- **Sub-Millisecond Dwell Time**  - By avoiding file I/O (reading content), the payload can scan an entire workstation in seconds, significantly reducing the window for EDR detection.
+
+## 📂 Repository Structure
+```
+├── test_suite_creation.py      # Script to rebuild the test environment
+├── master_training_dataset.csv # The labeled dataset used for training 
+├── CMakeLists.txt              # Build configuration for the C++ payload
+├── src/
+│   ├── main.cpp                # Entry point and performance benchmarking 
+│   ├── ModelScorer.cpp         # ML inference and feature engineering
+│   ├── FileScanner.cpp         # Recursive filesystem traversal logic 
+│   └── ModelTraining.ipynb     # End-to-end ML training and weight export pipeline 
+└── include/
+    ├── ModelWeights.h          # Exported model weights and bias constants 
+    ├── ModelScorer.h           # Headers for the scoring engine
+    └── FileScanner.h           # Headers for the scanner
+```
+
+## 🚀 Quick Start Guide
+
+### 1. Environment Initialization
+
+This project requires **Python 3.x** (for research and lab generation) and **CMake** (for payload compilation).
+
+> **Note:** If you have Visual Studio installed with "Desktop development with C++," you likely already have CMake.  
+>  Check by running `cmake --version` in your terminal.
+> 
+**Bash**
+```bash
+# Clone the repository
+git clone https://github.com/your-username/CyberSecurityMLproject
+cd CyberSecurityMLproject
+
+# Create a virtual environment and install dependencies
+python -m venv .venv
+
+# Windows:
+.venv\Scripts\activate
+
+# Linux/WSL:
+source .venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+## 2. Build the Test Environment
+
+Before running the payload, you must generate the test suite. This script builds a realistic, high-entropy filesystem structure in your project root using the metadata distributions identified in our research. Successfully running this will create a /test_data directory containing ~3,000 signal and noise files.
+
+```bash
+python test_suite_creation.py
+```
+
+## 3. Compile the Payload
+
+The C++ payload is designed for **zero-dependency execution**. We utilize **CMake** to generate an optimized **Release binary**, which ensures maximum inference speed and removes debug overhead:
+
+```bash
+cmake -S . -B build
+cmake --build build --config Release
+```
+
+## 4. Execute Inference
+
+Run the standalone binary to begin the prioritized scan of the generated test data.
+
+```bash
+.\build\Release\Payload.exe
+```
+---
+
+## 👨‍💻 Author
+**Ilan H. Rozinko** *Computer Science Student @ Ben-Gurion University* Specializing in Data Science 
+
+---
