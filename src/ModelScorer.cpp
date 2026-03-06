@@ -35,7 +35,10 @@ static int is_junk_ext(const std::wstring &extension, const std::unordered_set<s
 static double accumulate_hashing_weights(const std::wstring &w_input, const std::vector<double> &model_weights, int weight_offset)
 {
     // lossy conversion from wide string to narrow string for hashing
-    std::string input(w_input.begin(), w_input.end());
+    std::string input;
+    input.reserve(w_input.size());
+    for (wchar_t wc : w_input) 
+        input.push_back(static_cast<char>(wc));
 
     for (char &c : input)
         c = std::tolower(c); // lowercase to match Python behavior

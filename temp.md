@@ -15,23 +15,23 @@ By shifting the focus from file content to file metadata and directory structure
 
 ## 🛠️ Key Technical Pillars 
 
-- #### Multi-Target Classification
-    The engine is built for flexibility, featuring specialized models for **Finance**, **HR**, and **IT** targets to ensure the most relevant assets are surfaced immediately.
+### Multi-Target Classification
+The engine is built for flexibility, featuring specialized models for **Finance**, **HR**, and **IT** targets to ensure the most relevant assets are surfaced immediately.
 
-- #### Zero-Dependency Portability
-    The entire inference engine is compiled into a lightweight C++ binary with no external requirements - no Python environment, PyTorch libraries, or external DLLs are needed for deployment. This ensures a negligible forensic footprint and allows the payload to perform real-time scoring using only the pre-trained weights.
+### Zero-Dependency Portability
+The entire inference engine is compiled into a lightweight C++ binary with no external requirements - no Python environment, PyTorch libraries, or external DLLs are needed for deployment. This ensures a negligible forensic footprint and allows the payload to perform real-time scoring using only the pre-trained weights.
 
-- #### Trained on Real-World Data
-    The models were developed using a high-entropy dataset constructed from authentic corporate filesystem snapshots, public US government documents (GovDocs), and diverse GitHub repositories. By training on these real-world naming conventions and directory hierarchies, the system learns to distinguish between mundane system files and genuine high-value assets with high precision.
+### Trained on Real-World Data
+The models were developed using a high-entropy dataset constructed from authentic corporate filesystem snapshots, public US government documents (GovDocs), and diverse GitHub repositories. By training on these real-world naming conventions and directory hierarchies, the system learns to distinguish between mundane system files and genuine high-value assets with high precision.
 
-## 🏗️ Project Architecture
+### Dual-Component Architecture
 
-- #### Python Training Module
-    Employs feature engineering and **Logistic Regression** to learn the distinction between critical signals and system "noise" from a custom-built dataset.
-    This module produces the weights and biases for each model, which are then exported directly into a C++ header file.
+#### Python Training Module
+Employs feature engineering and **Logistic Regression** to learn the distinction between critical signals and system "noise" from a custom-built dataset.
+This module produces weights and biases for each model. They are then exported directly into C++ header files, bridging the gap between the research environment and the operational payload.
 
-- #### C++ Payload
-    A lightweight, standalone binary that traverses target drives and performs real-time inference. It extracts metadata on the fly to generate probability scores for each file, enabling the immediate ranking and prioritization of sensitive assets. It requires **zero external libraries or Python environments**, simulating a real-world, self-contained deployment.
+#### C++ Payload
+A lightweight, standalone binary that traverses target drives and performs real-time inference. It extracts metadata on the fly to generate probability scores for each file, enabling the immediate ranking and prioritization of sensitive assets. It requires **zero external libraries or Python environments**, simulating a real-world, self-contained deployment.
 
 ---
 
@@ -60,16 +60,16 @@ Score: 0.9514 | .\test_data\HR\Recruiting\Candidates\Interview_Notes_John_Johnso
 
 This section explains the "secret sauce" that allows the model to identify sensitive files without looking at their contents:
 
-#### 1. Structural Text Hashing (Quadgrams)
+### 1. Structural Text Hashing (Quadgrams)
 
 To "read" file paths without a lookup table, the system breaks strings into overlapping **4-character chunks called quadgrams**. These are processed using the **MurmurHash3** algorithm and mapped to a fixed **2048-feature vector**. This allows the model to mathematically recognize sensitive patterns like **budg** (from *budget*) or **payr** (from *payroll*) regardless of the surrounding text.
 
-#### 2. Temporal Decay Logic
+### 2. Temporal Decay Logic
 
 Time is a primary indicator of relevance. We implement a **hyperbolic decay function** to calculate a "Recency Score".
 This causes a **"half-life" effect** where a file exactly one year old receives a score of **0.5**. The model learns to prioritize fresh, active data over outdated noise.
 
-#### 3. Metadata Heuristics
+### 3. Metadata Heuristics
 
 The engine analyzes several secondary signals to refine its skeptical baseline:
 
@@ -91,6 +91,7 @@ The engine analyzes several secondary signals to refine its skeptical baseline:
 ├── master_training_dataset.csv # The labeled dataset used for training 
 ├── CMakeLists.txt              # Build configuration for the C++ payload
 ├── requirements.txt            # Python dependencies for the training module
+├── quick_setup.bat             # quick setup script for Windows users
 ├── src/
 │   ├── main.cpp                # Entry point and performance benchmarking 
 │   ├── ModelScorer.cpp         # ML inference and feature engineering
@@ -114,6 +115,10 @@ This project requires **Python 3.9+** (for research and lab generation) and **CM
 If you are on Windows and have Python and Visual Studio (C++ Build Tools) installed, you can initialize the entire environment, generate the test directory, and compile the payload by running:
 
 ```PowerShell
+# Clone the repository
+git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
+
+#run
 .\quick_setup.bat
 ```
 ---
@@ -124,8 +129,8 @@ If you are on Windows and have Python and Visual Studio (C++ Build Tools) instal
 **Bash**
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/CyberSecurityMLproject
-cd CyberSecurityMLproject
+git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
+cd ML-Powered_File_Prioritization_Engine
 
 # Create a virtual environment and install dependencies
 python -m venv .venv
@@ -140,7 +145,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Training vs. Research
-- **For Research**: Open *src/ModelTraining.ipynb* in VS Code/Jupyter and select the "Python (CyberML)" kernel to view charts and training metrics.
+- **For Research**: Open src/ModelTraining.ipynb in VS Code/Jupyter and select the "Python (CyberML)" kernel to view charts and training metrics.
 
 - **For Production**: To re-train models and update include/ModelWeights.h quickly, run the script:
 
@@ -175,10 +180,6 @@ After finishing the setup, Run the standalone binary to begin the prioritized sc
 .\build\Release\Payload.exe
 ```
 
-## ⚠️ Research Context
-
-This project is a **defensive research and academic exploration** of how metadata patterns can reveal sensitive data locations within large filesystems.  
-The techniques demonstrated here are intended for **cybersecurity research, data discovery, and digital forensics**, not unauthorized access.
 
 ## 👨‍💻 Author
 **Ilan H. Rozinko** *Computer Science Student @ Ben-Gurion University* Specializing in Data Science.
