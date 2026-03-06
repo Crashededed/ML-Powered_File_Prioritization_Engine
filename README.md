@@ -150,10 +150,16 @@ python src/train_models.py
 
 ### 3. Build the Test Environment
 
-Before running the payload, you must generate the test suite. This script builds a realistic, high-entropy filesystem structure in your project root using the metadata distributions identified in our research. Successfully running this will create a /test_data directory containing ~3,000 signal and noise files.
+Before running the payload, you must generate the test suite. This script builds a realistic, high-entropy filesystem structure using the metadata distributions identified in our research.
+
+By default, this creates a ./test_data directory containing ~3,000 files. You can customize the output location by specifying the --path argument:
 
 ```bash
+# Default:
 python test_suite_creation.py
+
+# Custom: Generate the test environment in a specific directory
+python test_suite_creation.py --path "C:\TestData"
 ```
 
 ### 4. Compile the Payload:
@@ -169,11 +175,17 @@ cmake --build build --config Release
 
 After finishing the setup, Run the standalone binary to begin the prioritized scan of the generated test data.
 
+By default, it will scan the `./test_data` directory and output the top 10 files for each target context (Finance, HR, IT). You can specify a different path or number of top files using command-line arguments:
+
+
 >**Note**: Ensure you are running the command from the project root.
 
 ```bash
+# Default: Scans ./test_data and shows the Top 10 results
 .\build\Release\Payload.exe
-```
+
+# Custom: Scan a specific directory and show the Top 5 results
+.\build\Release\Payload.exe --path "C:\TestData" --top 5```
 
 ## ⚠️ Research Context
 

@@ -3,8 +3,10 @@ import random
 import time
 import shutil
 import string
+import argparse
 
-BASE_DIR = "./test_data"
+
+
 NOW = int(time.time())
 DAY = 86400
 
@@ -396,4 +398,16 @@ def create_lab():
     print("Lab creation complete.")
 
 if __name__ == "__main__":
+    # command-line argument parsing for test directory path
+    parser = argparse.ArgumentParser(description="CyberML Test Lab Generator")
+    parser.add_argument("--path", type=str, default="./test_data", help="Path to generate the Test Directory")
+    args = parser.parse_args()
+
+    BASE_DIR = args.path
+
+    print(f"Rebuilding Test Directory at: {BASE_DIR}...")
+
+    if not os.path.exists(BASE_DIR):
+        os.makedirs(BASE_DIR)
+
     create_lab()

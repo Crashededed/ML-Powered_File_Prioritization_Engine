@@ -15,9 +15,6 @@ using Clock = Chrono::high_resolution_clock;
 using TimePoint = Clock::time_point;
 using Duration = Chrono::duration<double, std::milli>;
 
-// Number of top and bottom files to display for each target context
-const int N_SAMPLES = 10;
-
 // Define model contexts for each target with their respective weights, biases, and extension sets
 ModelContext GENERAL_CONTEXT = ModelContext{L"GENERAL", GENERAL_MODEL_WEIGHTS, GENERAL_MODEL_BIAS, GENERAL_HIGH_VAL_EXTS, GENERAL_JUNK_EXTS};
 ModelContext FINANCE_CONTEXT = ModelContext{L"FINANCE", FINANCE_MODEL_WEIGHTS, FINANCE_MODEL_BIAS, FINANCE_HIGH_VAL_EXTS, FINANCE_JUNK_EXTS};
@@ -140,26 +137,41 @@ void report_metrics(size_t total_files,
   std::wcout << L"============================================\n";
 }
 
-int main()
+int main(int argc, char* argv[])
 {
   // Set console output to UTF-16 to properly display wide characters(hebrew chars, etc.)
   _setmode(_fileno(stdout), _O_U16TEXT);
 
-  std::vector<ModelContext> targets =
-      {GENERAL_CONTEXT, FINANCE_CONTEXT, HR_CONTEXT, IT_CONTEXT};
-  const wchar_t *TARGET_PATH = L"./test_data";
+  std::vector<ModelContext> targets = {GENERAL_CONTEXT, FINANCE_CONTEXT, HR_CONTEXT, IT_CONTEXT};
 
-  if (!fs::exists(TARGET_PATH) || !fs::is_directory(TARGET_PATH))
+  std::wstring targetPath = L"./test_data";
+  int topN = 10;
+
+  // command-line argument parsing for --path and --top
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
+
+    if (arg == "--path" && i + 1 < argc) {
+      std::string p = argv[++i];
+      targetPath = std::wstring(p.begin(), p.end());
+    } 
+    else if (arg == "--top" && i + 1 < argc) 
+      topN = std::stoi(argv[++i]);
+  }
+
+  std::wcout << L"Target Path: " << targetPath << L" | Showing Top: " << topN << std::endl;
+
+  if (!fs::exists(targetPath) || !fs::is_directory(targetPath))
   {
     std::wcout << L"Error: Specified path does not exist or is not a directory." << std::endl;
     return 1;
   }
 
-  std::wcout << L"Scanning directory: " << TARGET_PATH << std::endl;
+  std::wcout << L"Scanning directory: " << targetPath << std::endl;
 
   // File discovery and feature extraction, metrics
   auto start_extraction = Clock::now();
-  std::vector<file_features> files = scan_directory(TARGET_PATH);
+  std::vector<file_features> files = scan_directory(targetPath);
   auto end_extraction = Clock::now();
 
   if (files.empty())
@@ -174,8 +186,8 @@ int main()
   auto start_inference = Clock::now();
   for (ModelContext &context : targets)
   {
-    RankingResult result = rank_files(files, context, N_SAMPLES);
-    print_target_rankings(result, context.target, N_SAMPLES);
+    RankingResult result = rank_files(files, context, topN);
+    print_target_rankings(result, context.target, topN);
 
     scoredFile highest_scored_file = result.top_files.front();
     calculate_file_score(highest_scored_file.file, context, true);
