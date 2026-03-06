@@ -1,3 +1,8 @@
+# 🚀 ML-Powered File Prioritization Engine
+### *High-Precision Data Exfiltration via Metadata Analysis*
+
+![C++](https://img.shields.io/badge/Language-C%2B%2B17-blue.svg) ![Python](https://img.shields.io/badge/Research-Python%203.9-green.svg) ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 ## 🎯 Project Overview
 
 In modern cyber operations, the challenge of data exfiltration is often defined by constraints: limited time windows, restrictive network bandwidth, and the constant threat of detection by behavioral-based security systems. Traditional methods that rely on keyword matching or deep-content scanning are often too slow and create a massive CPU footprint that triggers modern Endpoint Detection and Response (EDR) alerts.
@@ -45,12 +50,10 @@ The system successfully bridges the gap between theoretical machine learning and
 ```
 ANALYZING TARGET: HR
 
---- TOP 5 FILES ---
+--- TOP 3 FILES ---
 Score: 0.9896 | .\test_data\HR\Recruiting\Candidates\Employee_Benefits_2023.xlsx
 Score: 0.9684 | .\test_data\HR\Recruiting\Candidates\Onboarding_Checklist_Product.xlsx
-Score: 0.9616 | .\test_data\HR\Recruiting\Candidates\Salary_Scales_2025_FINAL.xlsx
 Score: 0.9514 | .\test_data\HR\Recruiting\Candidates\Interview_Notes_John_Johnson.docx
-Score: 0.8439 | .\test_data\Users\emily49\OneDrive - Corp\HR\Handbooks\Employee_Benefits_2024.xlsx
 ```
 
 ## 🧠 Technical Deep Dive: Feature Engineering
@@ -87,6 +90,7 @@ The engine analyzes several secondary signals to refine its skeptical baseline:
 ├── test_suite_creation.py      # Script to rebuild the test environment
 ├── master_training_dataset.csv # The labeled dataset used for training 
 ├── CMakeLists.txt              # Build configuration for the C++ payload
+├── requirements.txt            # Python dependencies for the training module
 ├── src/
 │   ├── main.cpp                # Entry point and performance benchmarking 
 │   ├── ModelScorer.cpp         # ML inference and feature engineering
@@ -102,7 +106,7 @@ The engine analyzes several secondary signals to refine its skeptical baseline:
 
 ### 1. Environment Initialization
 
-This project requires **Python 3.x** (for research and lab generation) and **CMake** (for payload compilation).
+This project requires **Python 3.9+** (for research and lab generation) and **CMake** (for payload compilation).
 
 > **Note:** If you have Visual Studio installed with "Desktop development with C++," you likely already have CMake.  
 >  Check by running `cmake --version` in your terminal.
@@ -125,7 +129,16 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 2. Build the Test Environment
+## 2. Training vs. Research
+- **For Research**: Open src/ModelTraining.ipynb in VS Code/Jupyter and select the "Python (CyberML)" kernel to view charts and training metrics.
+
+- **For Production**: To re-train models and update include/ModelWeights.h quickly, run the script:
+
+```Bash
+python src/train_models.py
+```
+
+## 3. Build the Test Environment
 
 Before running the payload, you must generate the test suite. This script builds a realistic, high-entropy filesystem structure in your project root using the metadata distributions identified in our research. Successfully running this will create a /test_data directory containing ~3,000 signal and noise files.
 
@@ -133,7 +146,7 @@ Before running the payload, you must generate the test suite. This script builds
 python test_suite_creation.py
 ```
 
-## 3. Compile the Payload
+## 4. Compile the Payload
 
 The C++ payload is designed for **zero-dependency execution**. We utilize **CMake** to generate an optimized **Release binary**, which ensures maximum inference speed and removes debug overhead:
 
@@ -142,16 +155,17 @@ cmake -S . -B build
 cmake --build build --config Release
 ```
 
-## 4. Execute Inference
+## 5. Execute Inference using the Payload
 
 Run the standalone binary to begin the prioritized scan of the generated test data.
+
+>**Note**: Ensure you are running the command from the project root.
 
 ```bash
 .\build\Release\Payload.exe
 ```
----
+
 
 ## 👨‍💻 Author
-**Ilan H. Rozinko** *Computer Science Student @ Ben-Gurion University* Specializing in Data Science 
+**Ilan H. Rozinko** *Computer Science Student @ Ben-Gurion University* Specializing in Data Science.
 
----

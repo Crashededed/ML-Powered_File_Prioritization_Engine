@@ -4,7 +4,7 @@ import time
 import shutil
 import string
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'test_data'))
+BASE_DIR = "./test_data"
 NOW = int(time.time())
 DAY = 86400
 
