@@ -79,11 +79,17 @@ The engine analyzes several secondary signals to refine its skeptical baseline:
 
 ## ⚙️ Payload Features - Performance-Oriented Engineering:
 
-- **Static Memory Allocation** - Uses priority queues to maintain only the top $N$ files per focus, preventing memory spikes when scanning millions of files.
+- **Static Memory Allocation:**   
+     Uses priority queues to maintain only the top $N$ files per focus, preventing memory spikes when scanning millions of files.
 
-- **W-Character Support** - Fully compatible with **UTF-16 filenames** (essential for diverse environments containing Hebrew, Russian, or specialized symbols).
+- **W-Character Support:**   
+ Fully compatible with **UTF-16 filenames** (essential for diverse environments containing Hebrew, Russian, or specialized symbols).
 
-- **Sub-Millisecond Dwell Time**  - By avoiding file I/O (reading content), the payload can scan an entire workstation in seconds, significantly reducing the window for EDR detection.
+- **Sub-Millisecond Dwell Time:**    
+ By avoiding file I/O (reading content), the payload can scan an entire workstation in seconds, significantly reducing the window for EDR detection.
+
+- **Standalone Execution:**   
+ The payload is compiled into a single executable with no external dependencies, ensuring it can run on any Windows machine without leaving a trace of Python or C++ runtime libraries.
 
 ## 📂 Repository Structure
 ```
@@ -190,6 +196,49 @@ By default, it will scan the `./test_data` directory and output the top 10 files
 # Custom: Scan a specific directory and show the Top 5 results
 .\build\Release\Payload.exe --path "C:\TestData" --top 5
 ```
+## How to interpret the results:
+The output will display the target context (e.g., HR) followed by a ranked list of files with their corresponding scores. Higher scores indicate a higher likelihood of being a sensitive file based on the metadata analysis.
+
+```plaintext
+ANALYZING TARGET: GENERAL       
+
+--- TOP 10 FILES ---
+Score: 0.9753 | .\test_data\Fin\Temp\Forecast_Mar2023.xlsx
+Score: 0.9581 | .\test_data\Users\User_1\AppData\Local\Temp\f8a2c1.key
+Score: 0.9465 | .\test_data\Users\nholmes\OneDrive - Corp\Forecasts\FY2025_R&D_Budget_v2.xlsx
+Score: 0.9462 | .\test_data\HR\Recruiting\Candidates\Emily_Resume_2023.docx
+Score: 0.9434 | .\test_data\Users\arthur13\Documents\Reporting\Expense_Accruals_2025.csv
+...
+```
+
+It is a good idea to treat the scores relatively rather than absolutely, as the system is designed to prioritize files within the context of the target focus rather than provide a binary classification. 
+
+**The Order is more important than the raw number.** The engine is designed to ensure that if an operator only has time to exfiltrate 10 files, those 10 are the most statistically significant assets on the drive.
+
+## Checking whether the payload is standalone:
+To verify the Zero-Dependency nature of the C++ Payload, you can confirm that it does not rely on external C++ runtimes or Python DLLs.
+
+On Windows, you can use the *Visual Studio Developer Command Prompt* and run:
+
+```bash
+#cd into the project root
+dumpbin /DEPENDENTS .\build\Release\Payload.exe
+
+#Output:
+Dump of file .\build\Release\Payload.exe
+
+File Type: EXECUTABLE IMAGE
+
+  Image has the following dependencies:
+
+    KERNEL32.dll
+
+    Summary...
+```
+
+A truly standalone binary will show only KERNEL32.dll as a dependency, with no references to Python or C++ runtime libraries. 
+
+KERNEL32.dll is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
 
 ## ⚠️ Research Context
 
