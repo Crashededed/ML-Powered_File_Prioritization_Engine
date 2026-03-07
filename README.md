@@ -236,14 +236,11 @@ File Type: EXECUTABLE IMAGE
     Summary...
 ```
 
-A truly standalone binary will show only KERNEL32.dll as a dependency, with no references to Python or C++ runtime libraries. 
-
-KERNEL32.dll is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
+A truly standalone binary will show only KERNEL32.dll as a dependency, with no references to Python or C++ runtime libraries. KERNEL32.dll is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
 
 ## ⚠️ Research Context
 
-This project is a **defensive research and academic exploration** of how metadata patterns can reveal sensitive data locations within large filesystems.  
-The techniques demonstrated here are intended for **cybersecurity research, data discovery, and digital forensics**, not unauthorized access.
+This project is a **defensive research and academic exploration** of how metadata patterns can reveal sensitive data locations within large filesystems.  The techniques demonstrated here are intended for **cybersecurity research, data discovery, and digital forensics**, not unauthorized access.
 
 ## 👨‍💻 Author
 **Ilan H. Rozinko** *Computer Science Student @ Ben-Gurion University* Specializing in Data Science.
