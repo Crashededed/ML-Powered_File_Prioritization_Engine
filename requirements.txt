@@ -8,5 +8,4 @@ scipy>=1.10.0
 matplotlib>=3.7.0
 
 # Notebook Environment
-jupyter>=1.0.0
 ipykernel>=6.0.0

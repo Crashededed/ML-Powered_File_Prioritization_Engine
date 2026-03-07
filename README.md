@@ -113,6 +113,7 @@ This project requires **Python 3.9+** (for research and lab generation) and **CM
 ## ⚡ Option A: Quick Setup (Windows)
 If you are on Windows and have Python and Visual Studio (C++ Build Tools) installed, you can initialize the entire environment, generate the test directory, and compile the payload by running:
 
+**Terminal**
 ```PowerShell
 git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
 cd ML-Powered_File_Prioritization_Engine
@@ -123,7 +124,7 @@ cd ML-Powered_File_Prioritization_Engine
 
 ### 1. Environment Initialization
 
-**Bash**
+**Terminal**
 ```bash
 # Clone the repository
 git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
@@ -142,7 +143,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Training vs. Research
-- **For Research**: Open *src/ModelTraining.ipynb* in VS Code/Jupyter and select the "Python (CyberML)" kernel to view charts and training metrics.
+- **For Research**: Open *src/ModelTraining.ipynb* in VS Code using the Jupyter extension and select the "Python (CyberML)" kernel to view charts and training metrics.
 
 - **For Production**: To re-train models and update include/ModelWeights.h quickly, run the script:
 
