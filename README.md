@@ -114,6 +114,8 @@ This project requires **Python 3.9+** (for research and lab generation) and **CM
 If you are on Windows and have Python and Visual Studio (C++ Build Tools) installed, you can initialize the entire environment, generate the test directory, and compile the payload by running:
 
 ```PowerShell
+git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
+cd ML-Powered_File_Prioritization_Engine
 .\quick_setup.bat
 ```
 ---
@@ -124,8 +126,8 @@ If you are on Windows and have Python and Visual Studio (C++ Build Tools) instal
 **Bash**
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/CyberSecurityMLproject
-cd CyberSecurityMLproject
+git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
+cd ML-Powered_File_Prioritization_Engine
 
 # Create a virtual environment and install dependencies
 python -m venv .venv
@@ -185,7 +187,8 @@ By default, it will scan the `./test_data` directory and output the top 10 files
 .\build\Release\Payload.exe
 
 # Custom: Scan a specific directory and show the Top 5 results
-.\build\Release\Payload.exe --path "C:\TestData" --top 5```
+.\build\Release\Payload.exe --path "C:\TestData" --top 5
+```
 
 ## ⚠️ Research Context
 
