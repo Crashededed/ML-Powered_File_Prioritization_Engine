@@ -108,95 +108,136 @@ The engine analyzes several secondary signals to refine its skeptical baseline:
     └── FileScanner.h           # Headers for the scanner
 ```
 
-## 🚀 Quick Start Guide
+# 🚀 Quick Start Guide
 
-This project requires **Python 3.9+** (for research and lab generation) and **CMake** (for payload compilation).
+This project is designed for **Windows** and requires the following tools to build and run:
 
-> **Note:** If you have Visual Studio installed with "Desktop development with C++," you likely already have CMake.  
->  Check by running `cmake --version` in your terminal.
-> 
----
-## ⚡ Option A: Quick Setup (Windows)
-If you are on Windows and have Python and Visual Studio (C++ Build Tools) installed, you can initialize the entire environment, generate the test directory, and compile the payload by running:
+1. **Python 3.9+**: Available from the [official Python website](https://www.python.org/downloads/).
+2. **Visual Studio C++ Build Tools**: Required to compile the C++ payload using CMake.  
+   * You must install the **"Desktop development with C++"** workload via the [*Build Tools for Visual Studio*](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026) Installer. This includes the necessary MSVC compiler and CMake.
+   
+You can run the project either through **Visual Studio Code** or entirely from the **terminal**.
 
-**Terminal**
-```PowerShell
+
+## 💻 Option A — VS Code Workflow (Recommended):
+
+If you use **Visual Studio Code**, setup is streamlined for both Python and C++ development.
+
+### 1. Install Required Extensions:
+
+From the VS Code Marketplace, install:
+
+- **Python** (`ms-python.python`)
+- **C/C++** (`ms-vscode.cpptools`)
+- **CMake Tools** (`ms-vscode.cmake-tools`)
+- **Jupyter** (optional, for notebook support)
+
+### 2. Clone the Repository:
+
+Open the integrated VS Code terminal and run:
+
+```powershell
 git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
 cd ML-Powered_File_Prioritization_Engine
-.\quick_setup.bat
+code .
 ```
----
-## 🛠️ Option B: Manual Setup
+> **Note:** This will open the project in a new VS Code window. Close the old one and use the terminal in the new window.
+### 3. Set Up the Python Environment:
 
-### 1. Environment Initialization
+In the integrated VS Code terminal run:
 
-**Terminal**
-```bash
-# Clone the repository
-git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
-cd ML-Powered_File_Prioritization_Engine
-
-# Create a virtual environment and install dependencies
+```powershell
 python -m venv .venv
-
-# Windows:
-.venv\Scripts\activate
-
-# Linux/WSL:
-source .venv/bin/activate
-
+.\.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Training vs. Research
-- **For Research**: Open *src/ModelTraining.ipynb* in VS Code using the Jupyter extension and select the "Python (CyberML)" kernel to view charts and training metrics.
+> **Note:** If you encounter a PowerShell execution policy error, run the following command:
+> ```powershell
+> Set-ExecutionPolicy Unrestricted -Scope CurrentUser
+> ```
+> Alternatively, you can switch your VS Code terminal profile to **Command Prompt**.
 
-- **For Production**: To re-train models and update include/ModelWeights.h quickly, run the script:
+After activation, set the interpreter in VS Code:
 
-```Bash
-python src/train_models.py
-```
+1. Open the **Command Palette** (`Ctrl+Shift+P`)
+2. Run **Python: Select Interpreter**
+3. Choose the `.venv` interpreter
 
-### 3. Build the Test Environment
-
+### 4. Generate the Test Environment
 Before running the payload, you must generate the test suite. This script builds a realistic, high-entropy filesystem structure using the metadata distributions identified in our research.
 
-By default, this creates a ./test_data directory containing ~3,000 files. You can customize the output location by specifying the --path argument:
+Create the test data directory:
 
-```bash
-# Default:
+```powershell
+# Default - generates a ./test_data directory in the project root:
 python test_suite_creation.py
-
-# Custom: Generate the test environment in a specific directory
+# Or specify a custom path:
 python test_suite_creation.py --path "C:\TestData"
 ```
 
-### 4. Compile the Payload:
+### 5. Build the C++ Payload
 
-The C++ payload is designed for **zero-dependency execution**. We utilize **CMake** to generate an optimized **Release binary**, which ensures maximum inference speed and removes debug overhead:
+1. Open the **Command Palette** (`Ctrl+Shift+P`)
+2. Run **CMake: Select a Kit** and choose your installed compiler (MSVC from Visual Studio).
+3. Run **CMake: Select Variant** and choose **Release**
+4. Run **CMake: Configure**
+5. Run **CMake: Build**
 
-```bash
+The executable will be created at: `.\build\Release\Payload.exe`
+
+## ⌨️ Option B — Pure Terminal Workflow (Windows):
+
+Because standard Windows terminals (like **CMD** or **PowerShell**) typically do not know where the **MSVC C++ compiler** is located, you must use Microsoft's specialized developer terminal.
+
+### 1. Open a Visual Studio Developer Terminal:
+
+Search your Windows **Start Menu** for one of the following and open:
+
+- **Developer Command Prompt for VS**
+- **x64 Native Tools Command Prompt**
+- **Developer PowerShell for VS**
+
+> Do **not** use a regular CMD or PowerShell window.
+
+### 2. Setup & Compile:
+
+Navigate to your desired directory inside the Developer Prompt and run the following:
+
+```powershell
+git clone https://github.com/Crashededed/ML-Powered_File_Prioritization_Engine
+cd ML-Powered_File_Prioritization_Engine
+
+# Initialize the Python environment and install dependencies
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+
+# Generate test dataset (default: ./test_data)
+python test_suite_creation.py
+# Or:
+python test_suite_creation.py --path "C:\TestData"
+
+# Build C++ payload
 cmake -S . -B build
 cmake --build build --config Release
 ```
 
-## Running the Payload:
+## ▶️ Running the Payload:
 
-After finishing the setup, Run the standalone binary to begin the prioritized scan of the generated test data.
+Once compiled (via either method), you can run the standalone binary from any standard terminal. By default, it will scan the ./test_data directory and output the top 10 files for each target context (Finance, HR, IT). 
 
-By default, it will scan the `./test_data` directory and output the top 10 files for each target context (Finance, HR, IT). You can specify a different path or number of top files using command-line arguments:
+After building, run the binary from the project root. You can specify a different path or number of top files using command-line arguments:
 
-
->**Note**: Ensure you are running the command from the project root.
-
-```bash
-# Default: Scans ./test_data and shows the Top 10 results
+```powershell
+# Default: Scan ./test_data and show Top 10 results
 .\build\Release\Payload.exe
 
-# Custom: Scan a specific directory and show the Top 5 results
+# Custom: Scan a specific directory and show Top 5 results
 .\build\Release\Payload.exe --path "C:\TestData" --top 5
 ```
-## How to interpret the results:
+
+## 💭 How to interpret the results:
 The output will display the target context (e.g., HR) followed by a ranked list of files with their corresponding scores. Higher scores indicate a higher likelihood of being a sensitive file based on the metadata analysis.
 
 ```plaintext
@@ -215,12 +256,14 @@ It is a good idea to treat the scores relatively rather than absolutely, as the 
 
 **The Order is more important than the raw number.** The engine is designed to ensure that if an operator only has time to exfiltrate 10 files, those 10 are the most statistically significant assets on the drive.
 
-## Checking whether the payload is standalone:
-To verify the Zero-Dependency nature of the C++ Payload, you can confirm that it does not rely on external C++ runtimes or Python DLLs.
+## ❗ Checking whether the payload is standalone:
+The payload is compiled with static runtime linking (/MT). This means that all necessary C++ runtime components are included within the executable itself, eliminating the need for external dependencies.
 
-On Windows, you can use the *Visual Studio Developer Command Prompt* and run:
+To verify the Zero-Dependency nature of the Payload, we can confirm that it does not rely on external C++ runtimes or Python DLLs.
 
-```bash
+On Windows, you can use the **Developer Command Prompt for VS** (or other variants mentioned in Option B) and run:
+
+```powershell
 #cd into the project root
 dumpbin /DEPENDENTS .\build\Release\Payload.exe
 
@@ -236,7 +279,8 @@ File Type: EXECUTABLE IMAGE
     Summary...
 ```
 
-A truly standalone binary will show only KERNEL32.dll as a dependency, with no references to Python or C++ runtime libraries. KERNEL32.dll is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
+A truly standalone binary will show only KERNEL32.dll as a dependency, with no references to Python or C++ runtime libraries.   
+KERNEL32.dll is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
 
 ## ⚠️ Research Context
 
