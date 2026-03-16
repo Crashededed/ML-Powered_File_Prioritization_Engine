@@ -5,7 +5,7 @@
 
 ## 🎯 Project Overview
 
-In modern cyber operations, the challenge of data exfiltration is often defined by constraints: limited time windows, restrictive network bandwidth, and the constant threat of detection by behavioral-based security systems. Traditional methods that rely on keyword matching or deep-content scanning are often too slow and create a massive CPU footprint that triggers modern Endpoint Detection and Response (EDR) alerts.
+In modern cyber operations, the challenge of data exfiltration is often defined by constraints: limited time windows, restrictive network bandwidth, and the constant threat of detection by behavioral-based security systems. Traditional methods that rely on keyword matching or content scanning are often slow and create a massive CPU footprint that triggers modern Endpoint Detection and Response (EDR) alerts.
 
 This project introduces a sophisticated alternative: **A metadata-centric machine learning engine designed to rank and prioritize High-Value Targets (HVTs)** with zero file-content interaction, designed for maximum stealth and precision.
 
@@ -41,7 +41,7 @@ The system successfully bridges the gap between theoretical machine learning and
 
 - **High Recall:** Achieved detection rates ranging from **0.82 (IT)** to **0.89 (Finance)**, even in highly imbalanced environments where sensitive files are statistically rare.
 
-- **Sub-Millisecond Speed:** The **C++ payload** delivers **sub-millisecond inference speeds per file**, ensuring minimal dwell time on a target system.
+- **Sub-Millisecond Speed:** The **C++ payload** delivers **sub-millisecond inference speeds per file**, ensuring minimal dwell time on a network.
 
 - **Stealth-First Design:** Maintains a **negligible CPU footprint** and effectively filters out system noise, making it a viable and stealthy alternative to traditional content-scanning methods.
 
@@ -86,7 +86,7 @@ The engine analyzes several secondary signals to refine its skeptical baseline:
  Fully compatible with **UTF-16 filenames** (essential for diverse environments containing Hebrew, Russian, or specialized symbols).
 
 - **Sub-Millisecond Dwell Time:**    
- By avoiding file I/O (reading content), the payload can scan an entire workstation in seconds, significantly reducing the window for EDR detection.
+ By avoiding file I/O (reading content), the payload can scan an entire workstation in seconds, significantly reducing the risk of detection.
 
 - **Standalone Execution:**   
  The payload is compiled into a single executable with no external dependencies, ensuring it can run on any Windows machine without leaving a trace of Python or C++ runtime libraries.
@@ -165,7 +165,8 @@ After activation, set the interpreter in VS Code:
 3. Choose the `.venv` interpreter
 
 ### 4. Generate the Test Environment
-Before running the payload, you must generate the test suite. This script builds a realistic, high-entropy filesystem structure using the metadata distributions identified in our research.
+Before running the payload, you must generate the test suite.   
+This script builds a realistic, high-entropy filesystem structure using the metadata distributions identified in our research.
 
 Create the test data directory:
 
@@ -230,7 +231,8 @@ The training module uses `master_training_dataset.csv` to fit Logistic Regressio
 You can interact with the training module in two ways:
 
 ### Option 1 - Via Jupyter Notebook:
-For a deep dive into the data science process, open the Jupyter Notebook. This Notebook contains the training process, provides visuals and detailed F1/Recall metrics for each model.
+For a deep dive into the data science process, open the Jupyter Notebook.   
+This Notebook contains the training process, provides visuals and detailed F1/Recall metrics for each model.
 
 1. Open `src/ModelTraining.ipynb` in VS Code.
 2. Set the active kernel to your `.venv` environment.
@@ -243,11 +245,12 @@ If you only want to quickly retrain the models and regenerate the C++ header fil
 python src/train_models.py
 ```
 
-> **⚠️ Important:** After retraining the models, you must recompile the C++ payload (using the CMake Build step) to ensure the updated weights in `ModelWeights.h` are included in the executable.
+> **⚠️ Important:** After retraining, you must recompile the C++ payload (using **CMake: Build**) to include the updated weights in the executable.
 
 ## ▶️ Running the Payload:
 
-Once compiled (via either method), you can run the standalone binary from any standard terminal. By default, it will scan the ./test_data directory and output the top 10 files for each target context (Finance, HR, IT). 
+Once compiled (via either method), you can run the standalone binary from any standard terminal.  
+By default, it will scan the ./test_data directory and output the top 10 files for each target context (Finance, HR, IT). 
 
 After building, run the binary from the project root. You can specify a different path or number of top files using command-line arguments:
 
@@ -263,7 +266,8 @@ After building, run the binary from the project root. You can specify a differen
 > If you don't find the executable in `.\build\Release\`, check `.\build\` for a `Payload.exe` file.
 
 ## 💭 How to interpret the results:
-The output will display the target context (e.g., HR) followed by a ranked list of files with their corresponding scores. Higher scores indicate a higher likelihood of being a sensitive file based on the metadata analysis.
+The output will display the target context (e.g., HR) followed by a ranked list of files with their corresponding scores.  
+ Higher scores indicate a higher likelihood of being a sensitive file based on the metadata analysis.
 
 ```plaintext
 ANALYZING TARGET: GENERAL       
