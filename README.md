@@ -184,8 +184,6 @@ python test_suite_creation.py --path "C:\TestData"
 4. Run **CMake: Configure**
 5. Run **CMake: Build**
 
-The executable will be created at: `.\build\Release\Payload.exe`
-
 ## ⌨️ Option B — Pure Terminal Workflow (Windows):
 
 Because standard Windows terminals (like **CMD** or **PowerShell**) typically do not know where the **MSVC C++ compiler** is located, you must use Microsoft's specialized developer terminal.
@@ -223,6 +221,30 @@ cmake -S . -B build
 cmake --build build --config Release
 ```
 
+## 🧠 Re-Training the Models (Optional)
+
+If you wish to customize feature engineering, adjust class weights, or train on your own dataset, you can rerun the training pipeline.
+
+The training module uses `master_training_dataset.csv` to fit Logistic Regression models for each target context and exports updated weights and biases to `include/ModelWeights.h` for the C++ payload.
+
+You can interact with the training module in two ways:
+
+### Option 1 - Via Jupyter Notebook:
+For a deep dive into the data science process, open the Jupyter Notebook. This Notebook contains the training process, provides visuals and detailed F1/Recall metrics for each model.
+
+1. Open `src/ModelTraining.ipynb` in VS Code.
+2. Set the active kernel to your `.venv` environment.
+3. Run cells sequentially to train models and export weights.
+
+### Option 2 - Via Terminal:
+If you only want to quickly retrain the models and regenerate the C++ header file, run this Python script from your terminal:
+
+```powershell
+python src/train_models.py
+```
+
+> **⚠️ Important:** After retraining the models, you must recompile the C++ payload (using the CMake Build step) to ensure the updated weights in `ModelWeights.h` are included in the executable.
+
 ## ▶️ Running the Payload:
 
 Once compiled (via either method), you can run the standalone binary from any standard terminal. By default, it will scan the ./test_data directory and output the top 10 files for each target context (Finance, HR, IT). 
@@ -236,6 +258,9 @@ After building, run the binary from the project root. You can specify a differen
 # Custom: Scan a specific directory and show Top 5 results
 .\build\Release\Payload.exe --path "C:\TestData" --top 5
 ```
+
+> **Note:** Depending on your system's default CMake generator (Ninja or VS), the output path may differ.  
+> If you don't find the executable in `.\build\Release\`, check `.\build\` for a `Payload.exe` file.
 
 ## 💭 How to interpret the results:
 The output will display the target context (e.g., HR) followed by a ranked list of files with their corresponding scores. Higher scores indicate a higher likelihood of being a sensitive file based on the metadata analysis.
