@@ -115,8 +115,9 @@ This project is designed for **Windows** and requires the following tools to bui
 
 1. **Python 3.9+**: Available from the [official Python website](https://www.python.org/downloads/).
 2. **Visual Studio C++ Build Tools**: Required to compile the C++ payload using CMake.  
-   * You must install the **"Desktop development with C++"** workload via the [*Build Tools for Visual Studio*](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026) Installer. This includes the necessary MSVC compiler and CMake.
-   
+   * You must install the **"Desktop development with C++"** workload via the [*Build Tools for Visual Studio*](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026) Installer. This includes the necessary MSVC compiler and CMake.  <img width="871" height="195" alt="Screenshot_124" src="https://github.com/user-attachments/assets/1dd98340-70c5-4549-bc5a-a1a6322badd2" />
+  
+
 You can run the project either through **Visual Studio Code** or entirely from the **terminal**.
 
 
@@ -206,13 +207,14 @@ Because standard Windows terminals (like **CMD** or **PowerShell**) typically do
 
 ### 1. Open a Visual Studio Developer Terminal:
 
-Search your Windows **Start Menu** for one of the following and open:
+Search your Windows **Start Menu** for one of the following and open: 
 
 - **Developer Command Prompt for VS**
 - **x64 Native Tools Command Prompt**
 - **Developer PowerShell for VS**
 
 > Do **not** use a regular CMD or PowerShell window.
+
 
 ### 2. Setup & Compile:
 
