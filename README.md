@@ -132,6 +132,13 @@ From the VS Code Marketplace, install:
 - **CMake Tools** (`ms-vscode.cmake-tools`)
 - **Jupyter** (optional, for notebook support)
 
+You can install all the necessary VS Code extensions at once by running this command in your terminal:
+
+```powershell
+code --install-extension ms-python.python --install-extension ms-vscode.cpptools --install-extension ms-vscode.cmake-tools --install-extension ms-toolsai.jupyter
+```
+
+
 ### 2. Clone the Repository:
 
 Open the integrated VS Code terminal and run:
@@ -165,8 +172,7 @@ After activation, set the interpreter in VS Code:
 3. Choose the `.venv` interpreter
 
 ### 4. Generate the Test Environment
-Before running the payload, you must generate the test suite.   
-This script builds a realistic, high-entropy filesystem structure using the metadata distributions identified in our research.
+Before running the payload, you must generate the test suite. This script builds a realistic, high-entropy filesystem structure using the metadata distributions identified in our research.
 
 Create the test data directory:
 
@@ -177,13 +183,18 @@ python test_suite_creation.py
 python test_suite_creation.py --path "C:\TestData"
 ```
 
+> ⚠️ **Warning:** The script will clear any existing data in the target directory, make sure to specify a path that is safe to overwrite.
+
 ### 5. Build the C++ Payload
 
 1. Open the **Command Palette** (`Ctrl+Shift+P`)
-2. Run **CMake: Select a Kit** and choose your installed compiler (MSVC from Visual Studio).
-3. Run **CMake: Select Variant** and choose **Release**
-4. Run **CMake: Configure**
-5. Run **CMake: Build**
+2. Run **CMake: Scan for Kits** 
+3. Run **CMake: Select a Kit** and choose your installed compiler, MSVC from Visual Studio
+4. Run **CMake: Select Variant** and choose **Release**
+5. Run **CMake: Configure**
+6. Run **CMake: Build**
+
+> ⚠️ **Troubleshooting:** If MSVC does not appear in the list of available kits (a known VS Code bug with certain Windows locales) or if you encounter any configuration errors, skip the remaining steps here and follow **Option B — Pure Terminal Workflow** below.
 
 ## ⌨️ Option B — Pure Terminal Workflow (Windows):
 
@@ -231,8 +242,7 @@ The training module uses `master_training_dataset.csv` to fit Logistic Regressio
 You can interact with the training module in two ways:
 
 ### Option 1 - Via Jupyter Notebook:
-For a deep dive into the data science process, open the Jupyter Notebook.   
-This Notebook contains the training process, provides visuals and detailed F1/Recall metrics for each model.
+For a deep dive into the data science process, open the Jupyter Notebook. This Notebook contains the training process, provides visuals and detailed F1/Recall metrics for each model.
 
 1. Open `src/ModelTraining.ipynb` in VS Code.
 2. Set the active kernel to your `.venv` environment.
@@ -249,8 +259,7 @@ python src/train_models.py
 
 ## ▶️ Running the Payload:
 
-Once compiled (via either method), you can run the standalone binary from any standard terminal.  
-By default, it will scan the ./test_data directory and output the top 10 files for each target context (Finance, HR, IT). 
+Once compiled (via either method), you can run the standalone binary from any standard terminal. By default, it will scan the ./test_data directory and output the top 10 files for each target context (Finance, HR, IT). 
 
 After building, run the binary from the project root. You can specify a different path or number of top files using command-line arguments:
 
@@ -262,12 +271,10 @@ After building, run the binary from the project root. You can specify a differen
 .\build\Release\Payload.exe --path "C:\TestData" --top 5
 ```
 
-> **Note:** Depending on your system's default CMake generator (Ninja or VS), the output path may differ.  
-> If you don't find the executable in `.\build\Release\`, check `.\build\` for a `Payload.exe` file.
+> **Note:** Depending on your system's default CMake generator (Ninja or VS), the output path may differ. If you don't find the executable in `.\build\Release\`, check `.\build\` for a `Payload.exe` file.
 
 ## 💭 How to interpret the results:
-The output will display the target context (e.g., HR) followed by a ranked list of files with their corresponding scores.  
- Higher scores indicate a higher likelihood of being a sensitive file based on the metadata analysis.
+The output will display the target context (e.g., HR) followed by a ranked list of files with their corresponding scores. Higher scores indicate a higher likelihood of being a sensitive file based on the metadata analysis.
 
 ```plaintext
 ANALYZING TARGET: GENERAL       
@@ -308,8 +315,7 @@ File Type: EXECUTABLE IMAGE
     Summary...
 ```
 
-A truly standalone binary will show only KERNEL32.dll as a dependency, with no references to Python or C++ runtime libraries.   
-KERNEL32.dll is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
+A truly standalone binary will show only *KERNEL32.dll* as a dependency, with no references to Python or C++ runtime libraries. *KERNEL32.dll* is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
 
 ## ⚠️ Research Context
 
