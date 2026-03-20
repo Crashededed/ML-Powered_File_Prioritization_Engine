@@ -101,7 +101,8 @@ The engine analyzes several secondary signals to refine its skeptical baseline:
 │   ├── main.cpp                # Entry point and performance benchmarking 
 │   ├── ModelScorer.cpp         # ML inference and feature engineering
 │   ├── FileScanner.cpp         # Recursive filesystem traversal logic 
-│   └── ModelTraining.ipynb     # End-to-end ML training and weight export pipeline 
+│   ├── ModelTraining.ipynb     # End-to-end ML training and weight export pipeline 
+│   └── ModelTraining.py        # Matching Python script for training
 └── include/
     ├── ModelWeights.h          # Exported model weights and bias constants 
     ├── ModelScorer.h           # Headers for the scoring engine
@@ -183,18 +184,21 @@ python test_suite_creation.py
 python test_suite_creation.py --path "C:\TestData"
 ```
 
-> ⚠️ **Warning:** The script will clear any existing data in the target directory, make sure to specify a path that is safe to overwrite.
+> ⚠️ **Warning:** The script will clear any existing data in the target directory. Make sure to specify a path that is safe to overwrite.
 
 ### 5. Build the C++ Payload
 
 1. Open the **Command Palette** (`Ctrl+Shift+P`)
 2. Run **CMake: Scan for Kits** 
 3. Run **CMake: Select a Kit** and choose your installed compiler, MSVC from Visual Studio
+
+> ⚠️ **Troubleshooting:** If MSVC does not appear in the list of available kits (a known VSC bug with certain Windows locales) or if you encounter any configuration errors, skip the remaining steps and follow **Option B — Pure Terminal Workflow** below.
+
 4. Run **CMake: Select Variant** and choose **Release**
 5. Run **CMake: Configure**
 6. Run **CMake: Build**
 
-> ⚠️ **Troubleshooting:** If MSVC does not appear in the list of available kits (a known VS Code bug with certain Windows locales) or if you encounter any configuration errors, skip the remaining steps here and follow **Option B — Pure Terminal Workflow** below.
+
 
 ## ⌨️ Option B — Pure Terminal Workflow (Windows):
 
@@ -232,30 +236,6 @@ python test_suite_creation.py --path "C:\TestData"
 cmake -S . -B build
 cmake --build build --config Release
 ```
-
-## 🧠 Re-Training the Models (Optional)
-
-If you wish to customize feature engineering, adjust class weights, or train on your own dataset, you can rerun the training pipeline.
-
-The training module uses `master_training_dataset.csv` to fit Logistic Regression models for each target context and exports updated weights and biases to `include/ModelWeights.h` for the C++ payload.
-
-You can interact with the training module in two ways:
-
-### Option 1 - Via Jupyter Notebook:
-For a deep dive into the data science process, open the Jupyter Notebook. This Notebook contains the training process, provides visuals and detailed F1/Recall metrics for each model.
-
-1. Open `src/ModelTraining.ipynb` in VS Code.
-2. Set the active kernel to your `.venv` environment.
-3. Run cells sequentially to train models and export weights.
-
-### Option 2 - Via Terminal:
-If you only want to quickly retrain the models and regenerate the C++ header file, run this Python script from your terminal:
-
-```powershell
-python src/train_models.py
-```
-
-> **⚠️ Important:** After retraining, you must recompile the C++ payload (using **CMake: Build**) to include the updated weights in the executable.
 
 ## ▶️ Running the Payload:
 
@@ -316,6 +296,31 @@ File Type: EXECUTABLE IMAGE
 ```
 
 A truly standalone binary will show only *KERNEL32.dll* as a dependency, with no references to Python or C++ runtime libraries. *KERNEL32.dll* is a core Windows library that provides essential system functions and is always present on Windows systems. It does not indicate an external dependency.
+
+
+## 🧠 Re-Training the Models (Optional)
+
+If you wish to customize feature engineering, adjust class weights, or train on your own dataset, you can rerun the training pipeline.
+
+The training module uses `master_training_dataset.csv` to fit Logistic Regression models for each target context and exports updated weights and biases to `include/ModelWeights.h` for the C++ payload.
+
+You can interact with the training module in two ways:
+
+### Option 1 - Via Jupyter Notebook:
+For a deep dive into the data science process, open the Jupyter Notebook. This Notebook contains the training process, provides visuals and detailed F1/Recall metrics for each model.
+
+1. Open `src/ModelTraining.ipynb` in VS Code.
+2. Set the active kernel to your `.venv` environment.
+3. Run cells sequentially to train models and export weights.
+
+### Option 2 - Via Terminal:
+If you only want to quickly retrain the models and regenerate the C++ header file, run this Python script from your terminal:
+
+```powershell
+python src/train_models.py
+```
+
+> **⚠️ Important:** After retraining, you must recompile the C++ payload (using **CMake: Build**) to include the updated weights in the executable.
 
 ## ⚠️ Research Context
 
